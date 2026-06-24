@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F-Selling | Đăng ký</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="glass-card login-box">
+            <h1 class="text-gradient" style="text-align: center;">F-Selling</h1>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Đăng ký tài khoản Người bán mới</p>
+            
+            <form id="registerForm">
+                <div>
+                    <label>Tên đăng nhập</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div>
+                    <label>Mật khẩu</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div>
+                    <label>Xác nhận Mật khẩu</label>
+                    <input type="password" id="confirm_password" required>
+                </div>
+                <button type="submit" style="width: 100%;">Đăng ký</button>
+                <div id="errorMsg" style="color: #ef4444; margin-top: 1rem; text-align: center;"></div>
+            </form>
+            <div style="text-align: center; margin-top: 1rem;">
+                <p>Đã có tài khoản? <a href="/index.html" style="color: var(--primary);">Đăng nhập ngay</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm_password').value;
+            
+            if(password !== confirm) {
+                return document.getElementById('errorMsg').innerText = "Mật khẩu xác nhận không khớp!";
+            }
+
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_]).+$/;
+            if (!regex.test(password)) {
+                return document.getElementById('errorMsg').innerText = "Mật khẩu phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số!";
+            }
+
+            try {
+                await apiCall('/auth/register', 'POST', { username, password, role: 'SELLER' });
+                alert("Đăng ký thành công! Đang chuyển hướng về trang đăng nhập...");
+                window.location.href = "/index.html";
+            } catch (err) {
+                document.getElementById('errorMsg').innerText = err.message;
+            }
+        });
+    </script>
+</body>
+</html>

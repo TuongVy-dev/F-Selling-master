@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển Admin | F-Selling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="nav-bar">
+        <h2 class="text-gradient">Quản trị viên F-Selling</h2>
+        <div class="flex-row">
+            <button onclick="downloadExcel()">Xuất Excel</button>
+            <button class="btn-outline" onclick="logout()">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Tabs Header -->
+        <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem;">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">Doanh thu Shop</button>
+            <button class="tab-btn" onclick="switchTab('logs')">Nhật Ký Hệ Thống</button>
+        </div>
+
+        <div id="dashboard" class="tab-content active glass-card">
+            <h3>Doanh thu các Shop</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tên Shop</th>
+                        <th>Tổng doanh thu (VNĐ)</th>
+                    </tr>
+                </thead>
+                <tbody id="shopList">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="logs" class="tab-content glass-card">
+            <h3>Nhật Ký Hệ Thống</h3>
+            <table class="db-table" style="margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Thời gian</th>
+                        <th>Người dùng</th>
+                        <th>Hành động</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody id="logList">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        if(localStorage.getItem('role') !== 'ADMIN') window.location.href = '/';
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if(tabId === 'logs') loadLogs();
+        }
+
+        async function loadDashboard() {
+            try {
+                const data = await apiCall('/dashboard/admin');
+                const tbody = document.getElementById('shopList');
+                tbody.innerHTML = '';
+                data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.shop_name}</td>
+                        <td style="color: var(--success); font-weight: 600;">${item.total_revenue.toLocaleString()} ₫</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                showToast(err.message);
+            }
+        }
+
+        async function downloadExcel() {
+            try {
+                const token = getToken();
+                const res = await fetch('/api/export/admin', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(!res.ok) throw new Error('Export failed');
+                
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'admin_revenue.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                showToast("Đã xuất Excel thành công!");
+            } catch (err) {
+                showToast(err.message);
+            }
+        }
+
+        async function loadLogs() {
+            try {
+                const data = await apiCall('/logs/admin');
+                const tbody = document.getElementById('logList');
+                tbody.innerHTML = '';
+                data.forEach(item => {
+                    const dt = new Date(item.created_at).toLocaleString('vi-VN');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${item.id}</td>
+                        <td>${dt}</td>
+                        <td><strong>${item.username}</strong></td>
+                        <td><span style="background: #E2E8F0; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">${item.action}</span></td>
+                        <td>${item.details}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                showToast(err.message);
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

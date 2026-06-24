@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển Người bán | F-Selling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .tab-btn {
+            background: transparent; border: none; color: var(--text-muted); padding: 0.75rem 1.25rem;
+            font-size: 1rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .db-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .db-table th, .db-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .db-table th { background: #F8FAFC; font-weight: 600; color: var(--text-muted); }
+        
+        .shop-switcher {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 0.5rem 1rem; border-radius: 8px; outline: none;
+            cursor: pointer; font-weight: 600; appearance: auto;
+        }
+        .shop-switcher option { background: #1E293B; color: white; }
+        
+        .shop-list-card {
+            background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;
+        }
+        .shop-list-card h4 { margin: 0; color: var(--text-main); }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <h2 class="text-gradient">Quản trị Cửa hàng</h2>
+        <div class="flex-row" style="gap: 1rem; align-items: center;">
+            <button onclick="openPosShopSelector()" style="display: flex; align-items: center; gap: 0.3rem; background: var(--primary);"><i class="ph ph-shopping-cart"></i> Mở POS Bán Hàng</button>
+            <button class="btn-outline" onclick="logout()" style="display: flex; align-items: center; gap: 0.3rem;"><i class="ph ph-sign-out"></i> Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 1200px; margin: 2rem auto;">
+        
+        <!-- Tabs Header -->
+        <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem;">
+            <button class="tab-btn active" onclick="switchTab('dashboard')"><i class="ph ph-chart-bar"></i> Thống Kê</button>
+            <button class="tab-btn" onclick="switchTab('warehouse')"><i class="ph ph-package"></i> Kho Hàng</button>
+            <button class="tab-btn" onclick="switchTab('voucher')"><i class="ph ph-ticket"></i> Khuyến Mãi</button>
+            <button class="tab-btn" onclick="switchTab('settings')"><i class="ph ph-sliders"></i> Cài Đặt</button>
+        </div>
+
+        <!-- TAB 1: THỐNG KÊ (DASHBOARD) -->
+        <div id="dashboard" class="tab-content active glass-card">
+            <div id="dashboardShopSelector" style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;"><i class="ph ph-storefront"></i> Chọn Cửa Hàng Xem Thống Kê</h3>
+                <div id="dashShopList" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+            </div>
+            
+            <div id="dashboardContent" style="display: none;">
+                <h3>Tổng quan <span id="currentShopName" class="text-gradient"></span></h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0;">
+                    <div style="background: #F8FAFC; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); text-align: center;">
+                        <h4 style="color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.9rem;">TỔNG DOANH THU</h4>
+                        <strong id="statRev" style="color: var(--primary); font-size: 1.8rem;">0 ₫</strong>
+                    </div>
+                    <div style="background: #F8FAFC; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); text-align: center;">
+                        <h4 style="color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.9rem;">TỔNG SỐ ĐƠN</h4>
+                        <strong id="statOrders" style="color: var(--text-main); font-size: 1.8rem;">0</strong>
+                    </div>
+                    <div style="background: #F8FAFC; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); text-align: center;">
+                        <h4 style="color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.9rem;">SẢN PHẨM ĐÃ BÁN</h4>
+                        <strong id="statSold" style="color: var(--text-main); font-size: 1.8rem;">0</strong>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-top: 2rem;">
+                    <div style="background: #F8FAFC; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h4 style="margin-bottom: 1rem; color: var(--text-main);">Xu hướng doanh thu (7 ngày)</h4>
+                        <div style="height: 220px;"><canvas id="revenueChart"></canvas></div>
+                    </div>
+                    <div style="background: #F8FAFC; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h4 style="margin-bottom: 1rem; color: var(--text-main);">Tỷ trọng Top 5 SP</h4>
+                        <div style="height: 220px; display: flex; justify-content: center;"><canvas id="productPieChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+                    <h4>Đơn hàng gần đây</h4>
+                    <button class="btn-outline" onclick="downloadExcel()"><i class="ph ph-file-xls"></i> Xuất Excel</button>
+                </div>
+                <table class="db-table">
+                    <thead>
+                        <tr><th>Mã ĐH</th><th>Ngày</th><th>Tổng tiền</th><th>Trạng thái</th></tr>
+                    </thead>
+                    <tbody id="orderList"></tbody>
+                </table>
+            </div>
+
+            <div id="noShopMsg" style="text-align: center; padding: 3rem;">
+                <i class="ph ph-storefront" style="font-size: 3rem; color: var(--text-muted);"></i>
+                <h3 style="margin-top: 1rem;">Bạn chưa có cửa hàng nào</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Vui lòng vào mục Cài đặt để tạo cửa hàng đầu tiên.</p>
+                <button onclick="switchTab('settings')">Đi tới Cài Đặt</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: WAREHOUSE -->
+        <div id="warehouse" class="tab-content glass-card">
+            <div id="warehouseShopSelector" style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;"><i class="ph ph-storefront"></i> Chọn Cửa Hàng Để Quản Lý Kho</h3>
+                <div id="whShopList" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+            </div>
+            
+            <div class="modal-body-split" id="warehouseContent" style="display: none;">
+                <div class="modal-col-form" style="border-right: 1px solid var(--border-color); padding-right: 2rem;">
+                    <h3 style="color: var(--primary);">Kho hàng: <span id="whShopName"></span></h3>
+                    <h3 style="margin-top: 1.5rem;">Thêm sản phẩm mới</h3>
+                    <div class="form-group">
+                        <label>Danh mục</label>
+                        <div style="display: flex; gap: 0.5rem; align-items: stretch;">
+                            <select id="catSelect" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color);"></select>
+                            <input type="text" id="newCatName" placeholder="Tên danh mục mới..." style="flex: 1; min-width: 150px; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: #F8FAFC; outline: none;">
+                            <button onclick="createCategory()" style="padding: 0 1.25rem; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.3rem;"><i class="ph ph-plus-circle"></i> Thêm</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mã sản phẩm (Tùy chọn - Tự động sinh nếu để trống)</label>
+                        <div class="input-wrapper"><i class="ph ph-barcode"></i><input type="text" id="prodCode" placeholder="Để trống để tự tạo mã"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên sản phẩm *</label>
+                        <div class="input-wrapper"><i class="ph ph-package"></i><input type="text" id="prodName" placeholder="Tên SP"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá bán (VNĐ) *</label>
+                        <div class="input-wrapper"><i class="ph ph-money"></i><input type="number" id="prodPrice" placeholder="Giá tiền"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Số lượng tồn kho *</label>
+                        <div class="input-wrapper"><i class="ph ph-stack"></i><input type="number" id="prodStock" placeholder="Tồn kho" value="100"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Hình ảnh *</label>
+                        <input type="file" id="prodImage" accept="image/*" style="margin-bottom: 1rem; width: 100%;">
+                    </div>
+                    <button onclick="createProduct()" style="width: 100%;"><i class="ph ph-plus"></i> Lưu vào kho</button>
+                </div>
+                <div class="modal-col-list">
+                    <h3>Sản phẩm trong kho</h3>
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        <table class="db-table">
+                            <thead><tr><th>Mã SP</th><th>Tên</th><th>Giá</th><th>Tồn</th><th>Hành động</th></tr></thead>
+                            <tbody id="prodList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: VOUCHER -->
+        <div id="voucher" class="tab-content glass-card">
+            <div id="voucherShopSelector" style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;"><i class="ph ph-storefront"></i> Chọn Cửa Hàng Quản Lý Khuyến Mãi</h3>
+                <div id="vcShopList" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+            </div>
+            
+            <div class="modal-body-split" id="voucherContent" style="display: none;">
+                <div class="modal-col-form" style="border-right: 1px solid var(--border-color); padding-right: 2rem;">
+                    <h3 style="color: var(--primary);">Khuyến Mãi: <span id="vcShopName"></span></h3>
+                    <h3 style="margin-top: 1.5rem;">Tạo Voucher mới</h3>
+                    <div class="form-group">
+                        <label>Mã Voucher *</label>
+                        <div class="input-wrapper"><i class="ph ph-ticket"></i><input type="text" id="vCode" style="text-transform: uppercase;" placeholder="VD: SUMMER2024"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Loại giảm giá</label>
+                        <select id="vType" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                            <option value="flat">Giảm trực tiếp (VNĐ)</option>
+                            <option value="percentage">Giảm theo phần trăm (%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá trị giảm *</label>
+                        <div class="input-wrapper"><i class="ph ph-money"></i><input type="number" id="vVal" placeholder="VD: 50000 hoặc 10"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Đơn tối thiểu</label>
+                        <div class="input-wrapper"><i class="ph ph-shopping-cart"></i><input type="number" id="vMin" value="0" placeholder="VD: 200000"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Giảm tối đa (Nếu chọn %)</label>
+                        <div class="input-wrapper"><i class="ph ph-arrows-down-up"></i><input type="number" id="vMax" value="0" placeholder="VD: Tối đa 20000"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Số lượt dùng (-1 là vô hạn)</label>
+                        <div class="input-wrapper"><i class="ph ph-users"></i><input type="number" id="vLimit" value="-1" placeholder="VD: 100"></div>
+                    </div>
+                    <button id="btnSaveVoucher" onclick="createOrUpdateVoucher()" style="width: 100%;"><i class="ph ph-plus-circle"></i> Lưu Khuyến Mãi</button>
+                    <button id="btnCancelEditVoucher" class="btn-outline" onclick="cancelEditVoucher()" style="width: 100%; display: none; margin-top: 0.5rem;">Hủy chỉnh sửa</button>
+                </div>
+                <div class="modal-col-list">
+                    <h3>Danh sách Voucher</h3>
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        <table class="db-table">
+                            <thead><tr><th>Mã</th><th>Loại</th><th>Giá trị</th><th>Đã dùng</th><th>Hành động</th></tr></thead>
+                            <tbody id="voucherList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: SETTINGS -->
+        <div id="settings" class="tab-content glass-card">
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; align-items: center;">
+                <h4 style="font-size: 1.25rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.5rem;"><i class="ph ph-sliders" style="color: var(--primary);"></i> Cấu hình Cửa hàng</h4>
+                <button onclick="openCreateShopForm()"><i class="ph ph-plus"></i> Tạo cửa hàng mới</button>
+            </div>
+
+            <!-- Danh sách Cửa hàng -->
+            <div id="shopsListContainer" style="margin-bottom: 2rem;">
+                <h4 style="margin-bottom: 1rem; color: var(--text-muted);">Danh sách các cửa hàng (Tối đa 3)</h4>
+                <div id="myShopsList"></div>
+            </div>
+            
+            <hr style="border-color: var(--border-color); margin-bottom: 2rem; display: none;" id="shopFormDivider">
+
+            <!-- Form Cập nhật / Tạo mới Cửa hàng -->
+            <div class="modal-body-split" id="shopFormContainer" style="display: none;">
+                <!-- Left Column -->
+                <div class="modal-col-form" style="border-right: 1px solid var(--border-color); padding-right: 2rem;">
+                    <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-main); display: flex; align-items: center; gap: 0.3rem;" id="formTitle">
+                        <i class="ph ph-storefront" style="color: var(--primary);"></i> Thông tin doanh nghiệp
+                    </h3>
+                    
+                    <!-- Live Preview -->
+                    <div class="store-card-preview-container">
+                        <div class="store-card-preview-card">
+                            <div class="store-card-header">
+                                <div class="store-card-title"><i class="ph ph-shield-check" style="color: #fbbf24;"></i> SMARTPOS STORE</div>
+                                <div class="store-card-badge verified"><i class="ph ph-check-circle"></i> Hoạt động</div>
+                            </div>
+                            <div id="previewCardName" class="store-card-name">Tên cửa hàng</div>
+                            <div class="store-card-info-row"><i class="ph ph-identification-card"></i><span>MST: &nbsp;</span><strong id="previewCardTaxCode">Chưa có</strong></div>
+                            <div class="store-card-info-row"><i class="ph ph-map-pin"></i><span>Địa chỉ: &nbsp;</span><span id="previewCardAddress">Chưa có</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tên Doanh nghiệp/Cửa hàng *</label>
+                        <div class="input-wrapper"><i class="ph ph-storefront"></i><input type="text" id="shopName" placeholder="VD: Hộ Kinh Doanh F-Selling"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ kinh doanh *</label>
+                        <div class="input-wrapper"><i class="ph ph-map-pin"></i><input type="text" id="shopAddress" placeholder="VD: 123 Nguyễn Văn Cừ, Quận 5, TP.HCM"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mã số thuế</label>
+                        <div class="input-wrapper"><i class="ph ph-identification-card"></i><input type="text" id="shopTaxCode" placeholder="VD: 0312345678"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <div class="input-wrapper"><i class="ph ph-phone"></i><input type="text" id="shopPhone" placeholder="VD: 0901234567"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <div class="input-wrapper"><i class="ph ph-envelope"></i><input type="email" id="shopEmail" placeholder="VD: lienhe@cuahang.com"></div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="modal-col-form" style="padding-left: 0.5rem;">
+                    <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-main); display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="ph ph-bank" style="color: var(--success);"></i> Cấu hình Thanh toán
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label>Ngân hàng *</label>
+                        <div class="input-wrapper"><i class="ph ph-buildings"></i>
+                            <select id="bankCode" style="width: 100%; border: none; background: transparent; outline: none; padding-left: 0.5rem;">
+                                <option value="VCB">Vietcombank (VCB)</option>
+                                <option value="MB">MBBank (MB)</option>
+                                <option value="TCB">Techcombank (TCB)</option>
+                                <option value="ACB">ACB</option>
+                                <option value="VPB">VPBank (VPB)</option>
+                                <option value="BIDV">BIDV</option>
+                                <option value="CTG">VietinBank (CTG)</option>
+                                <option value="TPB">TPBank (TPB)</option>
+                                <option value="HDB">HDBank (HDB)</option>
+                                <option value="VIB">VIB</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Số tài khoản nhận tiền *</label>
+                        <div class="input-wrapper"><i class="ph ph-list-numbers"></i><input type="text" id="bankAcc" placeholder="VD: 10123456789"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên chủ tài khoản *</label>
+                        <div class="input-wrapper"><i class="ph ph-user"></i><input type="text" id="bankAccName" placeholder="VD: NGUYEN VAN A"></div>
+                    </div>
+                    
+                    <button id="btnSaveShop" onclick="saveShop()" style="width: 100%; margin-top: 1.5rem; font-size: 1.05rem;">
+                        <i class="ph ph-check-circle"></i> Lưu Cài Đặt Cửa Hàng
+                    </button>
+                    <button class="btn-outline" onclick="closeShopForm()" style="width: 100%; margin-top: 0.5rem;">Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Mở POS -->
+    <div id="posModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: #1E293B; padding: 2rem; border-radius: 12px; width: 400px; max-width: 90%; border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><i class="ph ph-desktop" style="color: var(--primary);"></i> Chọn Cửa Hàng Mở POS</h3>
+            <div id="posShopList" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;"></div>
+            <button class="btn-outline" onclick="document.getElementById('posModal').style.display='none'" style="width: 100%;">Hủy bỏ</button>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        if(localStorage.getItem('role') !== 'SELLER') window.location.href = '/';
+        
+        let allShops = [];
+        let currentShopId = null;
+        let editShopId = null; // null = create mode, id = edit mode
+        let dashboardShopId = null;
+        let chartInstance = null;
+        let pieChartInstance = null;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Live Preview Logic
+        document.getElementById('shopName').addEventListener('input', e => document.getElementById('previewCardName').innerText = e.target.value || 'Tên cửa hàng');
+        document.getElementById('shopTaxCode').addEventListener('input', e => document.getElementById('previewCardTaxCode').innerText = e.target.value || 'Chưa có');
+        document.getElementById('shopAddress').addEventListener('input', e => document.getElementById('previewCardAddress').innerText = e.target.value || 'Chưa có');
+
+        async function init() {
+            try {
+                allShops = await apiCall('/shops');
+                renderShopsList(); // Cho phần cài đặt
+                renderShopSelectors(); // Cho các tab Kho, Voucher, Dashboard, POS
+                
+                if(allShops.length === 0) {
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    document.getElementById('noShopMsg').style.display = 'block';
+                    openCreateShopForm();
+                } else {
+                    // Mặc định nạp dữ liệu cho shop đầu tiên nếu có currentShopId
+                    let savedId = localStorage.getItem('currentShopId');
+                    if(savedId && allShops.find(s => s.id == savedId)) {
+                        currentShopId = parseInt(savedId);
+                    } else {
+                        currentShopId = allShops[0].id;
+                        localStorage.setItem('currentShopId', currentShopId);
+                    }
+                    loadDataForCurrentShop();
+                }
+            } catch(e) { showToast(e.message); }
+        }
+
+        function renderShopSelectors() {
+            const dashList = document.getElementById('dashShopList');
+            const whList = document.getElementById('whShopList');
+            const vouList = document.getElementById('vouShopList');
+            const posList = document.getElementById('posShopList');
+            
+            dashList.innerHTML = '';
+            if(whList) whList.innerHTML = '';
+            if(vouList) vouList.innerHTML = '';
+            if(posList) posList.innerHTML = '';
+            
+            allShops.forEach(s => {
+                // Dashboard (Thống Kê)
+                const btn1 = document.createElement('button');
+                btn1.className = dashboardShopId === s.id ? 'btn-primary' : 'btn-outline';
+                btn1.innerText = s.name;
+                btn1.onclick = () => loadDashboardShop(s.id);
+                dashList.appendChild(btn1);
+
+                // Warehouse
+                if(whList) {
+                    const btn2 = document.createElement('button');
+                    btn2.className = currentShopId === s.id ? 'btn-primary' : 'btn-outline';
+                    btn2.innerText = s.name;
+                    btn2.onclick = () => { currentShopId = s.id; loadDataForCurrentShop(); };
+                    whList.appendChild(btn2);
+                }
+
+                // Voucher
+                if(vouList) {
+                    const btn3 = document.createElement('button');
+                    btn3.className = currentShopId === s.id ? 'btn-primary' : 'btn-outline';
+                    btn3.innerText = s.name;
+                    btn3.onclick = () => { currentShopId = s.id; loadDataForCurrentShop(); };
+                    vouList.appendChild(btn3);
+                }
+                
+                // POS
+                if(posList) {
+                    posList.innerHTML += `<button style="width: 100%; padding: 1rem; text-align: left; display: flex; align-items: center; gap: 0.5rem;" onclick="goToPOS(${s.id})"><i class="ph ph-storefront"></i> ${s.name}</button>`;
+                }
+            });
+        }
+
+        function openPosShopSelector() {
+            if(allShops.length === 0) return showToast("Vui lòng tạo cửa hàng trước!");
+            document.getElementById('posModal').style.display = 'flex';
+        }
+
+        async function loadDashboardShop(id) {
+            dashboardShopId = id;
+            try {
+                // Lấy thông tin shop
+                const shop = allShops.find(s => s.id === id);
+                document.getElementById('currentShopName').innerText = shop ? shop.name : '';
+
+                // Lấy đơn hàng (API cũ) cho danh sách đơn hàng
+                const res = await apiCall(`/dashboard/seller/${id}`);
+                const tbody = document.getElementById('orderList');
+                tbody.innerHTML = '';
+                res.orders.forEach(o => {
+                    const statusColor = o.status === 'PAID' ? 'var(--success)' : '#F59E0B';
+                    const dt = new Date(o.date).toLocaleString('vi-VN');
+                    tbody.innerHTML += `<tr>
+                        <td><strong>#${o.id}</strong></td>
+                        <td>${dt}</td>
+                        <td>${o.total.toLocaleString()} ₫</td>
+                        <td style="color: ${statusColor}; font-weight: 600;">${o.status}</td>
+                    </tr>`;
+                });
+
+                // Lấy số liệu thống kê & biểu đồ (API mới)
+                const stats = await apiCall(`/shops/${id}/stats`);
+                
+                document.getElementById('statRev').innerText = stats.total_revenue.toLocaleString() + ' ₫';
+                document.getElementById('statOrders').innerText = stats.total_orders;
+                document.getElementById('statSold').innerText = stats.total_sold;
+                
+                // Top Products Pie Chart
+                const pieCtx = document.getElementById('productPieChart').getContext('2d');
+                if (pieChartInstance) pieChartInstance.destroy();
+                
+                const pieLabels = stats.top_products.map(p => p.name);
+                const pieData = stats.top_products.map(p => p.qty);
+                const pieColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+
+                pieChartInstance = new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: pieLabels.length ? pieLabels : ['Chưa có dữ liệu'],
+                        datasets: [{
+                            data: pieData.length ? pieData : [1],
+                            backgroundColor: pieData.length ? pieColors : ['#E2E8F0'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { boxWidth: 12 } }
+                        }
+                    }
+                });
+                
+                // Chart
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: stats.trend_labels,
+                        datasets: [{
+                            label: 'Doanh thu (VNĐ)',
+                            data: stats.trend_data,
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                document.getElementById('dashboardContent').style.display = 'block';
+                // Update UI button selection visually
+                const dashList = document.getElementById('dashShopList');
+                if(dashList) {
+                    Array.from(dashList.children).forEach(btn => {
+                        if(btn.innerText === shop.name) btn.className = 'btn-primary';
+                        else btn.className = 'btn-outline';
+                    });
+                }
+            } catch(e) { showToast(e.message); }
+        }
+
+        function goToPOS(id) {
+            localStorage.setItem('currentShopId', id);
+            window.location.href = '/pos.html';
+        }
+
+        function changeShop(id) {
+            currentShopId = parseInt(id);
+            localStorage.setItem('currentShopId', currentShopId);
+            loadDataForCurrentShop();
+            showToast("Đã tải dữ liệu Cửa hàng: " + allShops.find(s=>s.id===id).name);
+        }
+
+        function loadDataForCurrentShop() {
+            if(allShops.length === 0) return;
+            document.getElementById('dashboardContent').style.display = 'block';
+            document.getElementById('warehouseContent').style.display = 'grid';
+            document.getElementById('voucherContent').style.display = 'grid';
+            document.getElementById('noShopMsg').style.display = 'none';
+            
+            const shop = allShops.find(s => s.id === currentShopId);
+            document.getElementById('currentShopName').innerText = shop.name;
+            document.getElementById('whShopName').innerText = shop.name;
+            document.getElementById('vcShopName').innerText = shop.name;
+            
+            // Clear inputs for new shop
+            document.getElementById('prodCode').value = '';
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodImage').value = '';
+            document.getElementById('newCatName').value = '';
+            
+            loadDashboard();
+            loadCategories();
+            loadProducts();
+            loadVouchers();
+        }
+
+        // Settings List Render
+        function renderShopsList() {
+            const listDiv = document.getElementById('myShopsList');
+            listDiv.innerHTML = '';
+            if(allShops.length === 0) {
+                listDiv.innerHTML = '<p>Chưa có cửa hàng nào.</p>';
+                return;
+            }
+            allShops.forEach(s => {
+                const activeBadge = s.is_active ? '<span style="color:var(--success); font-size: 0.8rem; margin-left: 0.5rem; padding: 2px 6px; background: rgba(16,185,129,0.1); border-radius: 4px;">ACTIVE</span>' : '<span style="color:#ef4444; font-size: 0.8rem; margin-left: 0.5rem; padding: 2px 6px; background: rgba(239,68,68,0.1); border-radius: 4px;">INACTIVE</span>';
+                const toggleBtn = `<button class="btn-outline" onclick="toggleShopStatus(${s.id})" style="padding: 0.5rem 1rem; margin-right: 0.5rem;" title="Đổi trạng thái"><i class="ph ph-power"></i></button>`;
+                
+                listDiv.innerHTML += `
+                    <div class="shop-list-card">
+                        <div>
+                            <h4 style="display:flex; align-items:center;">${s.name} ${activeBadge}</h4>
+                            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.3rem;"><i class="ph ph-map-pin"></i> ${s.business_address || 'Chưa cập nhật'}</div>
+                        </div>
+                        <div style="display: flex;">
+                            ${toggleBtn}
+                            <button class="btn-outline" onclick="openEditShopForm(${s.id})" style="padding: 0.5rem 1rem;"><i class="ph ph-pencil"></i> Chỉnh sửa</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function toggleShopStatus(id) {
+            try {
+                await apiCall(`/shops/${id}/status`, 'PUT');
+                showToast("Đã cập nhật trạng thái cửa hàng!");
+                init();
+            } catch(e) { showToast(e.message); }
+        }
+
+        function openCreateShopForm() {
+            if(allShops.length >= 3) return showToast("Bạn đã đạt giới hạn 3 cửa hàng!");
+            editShopId = null;
+            document.getElementById('formTitle').innerHTML = `<i class="ph ph-storefront" style="color: var(--primary);"></i> Tạo Cửa Hàng Mới`;
+            document.getElementById('btnSaveShop').innerHTML = `<i class="ph ph-plus-circle"></i> Xác nhận Tạo mới`;
+            
+            // Clear form
+            document.getElementById('shopName').value = '';
+            document.getElementById('shopAddress').value = '';
+            document.getElementById('shopTaxCode').value = '';
+            document.getElementById('shopPhone').value = '';
+            document.getElementById('shopEmail').value = '';
+            document.getElementById('bankCode').value = '';
+            document.getElementById('bankAcc').value = '';
+            document.getElementById('bankAccName').value = '';
+            
+            triggerPreview();
+            
+            document.getElementById('shopFormContainer').style.display = 'grid';
+            document.getElementById('shopFormDivider').style.display = 'block';
+        }
+
+        function openEditShopForm(id) {
+            editShopId = id;
+            const shop = allShops.find(s => s.id === id);
+            document.getElementById('formTitle').innerHTML = `<i class="ph ph-storefront" style="color: var(--primary);"></i> Chỉnh sửa: ${shop.name}`;
+            document.getElementById('btnSaveShop').innerHTML = `<i class="ph ph-check-circle"></i> Lưu Cập nhật`;
+            
+            // Fill Settings Form
+            document.getElementById('shopName').value = shop.name;
+            document.getElementById('shopAddress').value = shop.business_address || '';
+            document.getElementById('shopTaxCode').value = shop.tax_code || '';
+            document.getElementById('shopPhone').value = shop.phone || '';
+            document.getElementById('shopEmail').value = shop.email || '';
+            document.getElementById('bankCode').value = shop.bank_code;
+            document.getElementById('bankAcc').value = shop.bank_account_no;
+            document.getElementById('bankAccName').value = shop.bank_account_name || '';
+            
+            triggerPreview();
+            
+            document.getElementById('shopFormContainer').style.display = 'grid';
+            document.getElementById('shopFormDivider').style.display = 'block';
+        }
+
+        function triggerPreview() {
+            document.getElementById('shopName').dispatchEvent(new Event('input'));
+            document.getElementById('shopTaxCode').dispatchEvent(new Event('input'));
+            document.getElementById('shopAddress').dispatchEvent(new Event('input'));
+        }
+
+        function closeShopForm() {
+            document.getElementById('shopFormContainer').style.display = 'none';
+            document.getElementById('shopFormDivider').style.display = 'none';
+        }
+
+        async function saveShop() {
+            const body = {
+                name: document.getElementById('shopName').value,
+                business_address: document.getElementById('shopAddress').value,
+                tax_code: document.getElementById('shopTaxCode').value,
+                phone: document.getElementById('shopPhone').value,
+                email: document.getElementById('shopEmail').value,
+                bank_account_no: document.getElementById('bankAcc').value,
+                bank_account_name: document.getElementById('bankAccName').value,
+                bank_code: document.getElementById('bankCode').value
+            };
+            
+            try {
+                if(editShopId) {
+                    await apiCall(`/shops/${editShopId}`, 'PUT', body);
+                    showToast("Cập nhật cửa hàng thành công!");
+                } else {
+                    await apiCall('/shops', 'POST', body);
+                    showToast("Tạo cửa hàng mới thành công!");
+                }
+                setTimeout(() => location.reload(), 1000);
+            } catch(e) { showToast(e.message); }
+        }
+
+        // --- DASHBOARD / DATA LOGIC ---
+        async function loadDashboard() {
+            if(!currentShopId) return;
+            const data = await apiCall(`/dashboard/seller/${currentShopId}`);
+            document.getElementById('totalRev').innerText = data.total_revenue.toLocaleString() + ' ₫';
+            const tbody = document.getElementById('orderList');
+            tbody.innerHTML = '';
+            data.orders.slice(0, 10).forEach(o => {
+                tbody.innerHTML += `<tr><td>#${o.id}</td><td>${new Date(o.date).toLocaleDateString()}</td><td>${o.total.toLocaleString()} ₫</td><td>${o.status}</td></tr>`;
+            });
+        }
+
+        async function loadCategories() {
+            if(!currentShopId) return;
+            const cats = await apiCall(`/categories/${currentShopId}`);
+            const sel = document.getElementById('catSelect');
+            sel.innerHTML = '';
+            cats.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        }
+        
+        async function createCategory() {
+            if(!currentShopId) return;
+            const name = document.getElementById('newCatName').value;
+            if(!name) return;
+            await apiCall(`/categories?name=${name}&shop_id=${currentShopId}`, 'POST');
+            loadCategories();
+            document.getElementById('newCatName').value = '';
+        }
+
+        async function loadProducts() {
+            if(!currentShopId) return;
+            const prods = await apiCall(`/products/${currentShopId}`);
+            const tbody = document.getElementById('prodList');
+            tbody.innerHTML = '';
+            prods.forEach(p => {
+                const activeText = p.is_active ? '<span style="color:var(--success); font-weight:600; font-size: 0.8rem;">ACTIVE</span>' : '<span style="color:#ef4444; font-weight:600; font-size: 0.8rem;">INACTIVE</span>';
+                tbody.innerHTML += `<tr>
+                    <td>${p.code||'--'}</td>
+                    <td>${p.name} <br>${activeText}</td>
+                    <td>${p.price.toLocaleString()} ₫</td>
+                    <td>${p.stock}</td>
+                    <td style="display:flex; gap:0.3rem;">
+                        <button class="btn-outline" onclick="toggleProductStatus(${p.id})" style="padding: 0.2rem 0.5rem;" title="Bật/Tắt"><i class="ph ph-power"></i></button>
+                        <button class="btn-outline" onclick="deleteProduct(${p.id})" style="padding: 0.2rem 0.5rem; color:#ef4444;" title="Xóa"><i class="ph ph-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        async function deleteProduct(id) {
+            if(!confirm("Bạn có chắc muốn xóa Sản phẩm này?")) return;
+            try {
+                await apiCall(`/products/${id}`, 'DELETE');
+                showToast("Đã xóa sản phẩm!");
+                loadProducts();
+            } catch(e) { showToast(e.message); }
+        }
+
+        async function toggleProductStatus(id) {
+            try {
+                await apiCall(`/products/${id}/status`, 'PUT');
+                showToast("Cập nhật trạng thái SP thành công!");
+                loadProducts();
+            } catch(e) { showToast(e.message); }
+        }
+
+        async function createProduct() {
+            if(!currentShopId) return;
+            const catSelect = document.getElementById('catSelect');
+            if(!catSelect || !catSelect.value) {
+                return showToast("Lỗi: Bạn phải tạo Danh mục cho cửa hàng này trước!");
+            }
+            const formData = new FormData();
+            formData.append('code', document.getElementById('prodCode').value);
+            formData.append('name', document.getElementById('prodName').value);
+            const priceStr = document.getElementById('prodPrice').value;
+            const stockStr = document.getElementById('prodStock').value;
+            
+            if(parseFloat(priceStr) <= 0) return showToast("Giá sản phẩm phải lớn hơn 0!");
+            if(parseInt(stockStr) < 0) return showToast("Số lượng không được âm!");
+
+            formData.append('price', priceStr);
+            formData.append('stock', stockStr);
+            formData.append('category_id', catSelect.value);
+            const img = document.getElementById('prodImage').files[0];
+            if(img) formData.append('image', img);
+
+            try {
+                const res = await fetch(`/api/products?shop_id=${currentShopId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${getToken()}` },
+                    body: formData
+                });
+                if(!res.ok) {
+                    let errMsg = "Lỗi lưu sản phẩm";
+                    try {
+                        const errData = await res.json();
+                        if(errData.detail) {
+                            let msg = errData.detail;
+                            if (Array.isArray(msg) && msg.length > 0 && msg[0].msg) {
+                                errMsg = msg[0].msg;
+                            } else if (typeof msg === 'object') {
+                                errMsg = JSON.stringify(msg);
+                            } else {
+                                errMsg = msg;
+                            }
+                        }
+                    } catch(err) {}
+                    throw new Error(errMsg);
+                }
+                showToast("Đã lưu sản phẩm vào kho!");
+                loadProducts();
+            } catch(e) { showToast(e.message); }
+        }
+
+        let currentVouchers = [];
+        let editingVoucherId = null;
+
+        async function loadVouchers() {
+            if(!currentShopId) return;
+            currentVouchers = await apiCall(`/vouchers/${currentShopId}`);
+            const tbody = document.getElementById('voucherList');
+            tbody.innerHTML = '';
+            currentVouchers.forEach(v => {
+                tbody.innerHTML += `<tr>
+                    <td><strong>${v.code}</strong></td>
+                    <td>${v.discount_type==='flat'?'VNĐ':'%'}</td>
+                    <td>${v.discount_value}</td>
+                    <td>${v.usage_count}/${v.usage_limit===-1?'∞':v.usage_limit}</td>
+                    <td style="display:flex; gap:0.3rem;">
+                        <button class="btn-outline" onclick="editVoucher(${v.id})" style="padding:0.2rem 0.5rem;"><i class="ph ph-pencil"></i></button>
+                        <button class="btn-outline" onclick="deleteVoucher(${v.id})" style="padding:0.2rem 0.5rem; color:#ef4444;"><i class="ph ph-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function editVoucher(id) {
+            const v = currentVouchers.find(x => x.id === id);
+            if(!v) return;
+            editingVoucherId = id;
+            document.getElementById('vCode').value = v.code;
+            document.getElementById('vType').value = v.discount_type;
+            document.getElementById('vVal').value = v.discount_value;
+            document.getElementById('vMin').value = v.min_order_value;
+            document.getElementById('vMax').value = v.max_discount;
+            document.getElementById('vLimit').value = v.usage_limit;
+            document.getElementById('btnSaveVoucher').innerHTML = '<i class="ph ph-check-circle"></i> Cập nhật Khuyến Mãi';
+            document.getElementById('btnCancelEditVoucher').style.display = 'block';
+        }
+
+        function cancelEditVoucher() {
+            editingVoucherId = null;
+            document.getElementById('vCode').value = '';
+            document.getElementById('vType').value = 'flat';
+            document.getElementById('vVal').value = '';
+            document.getElementById('vMin').value = '0';
+            document.getElementById('vMax').value = '0';
+            document.getElementById('vLimit').value = '-1';
+            document.getElementById('btnSaveVoucher').innerHTML = '<i class="ph ph-plus-circle"></i> Tạo Mã Khuyến Mãi';
+            document.getElementById('btnCancelEditVoucher').style.display = 'none';
+        }
+
+        async function createOrUpdateVoucher() {
+            if(!currentShopId) return;
+            const body = {
+                code: document.getElementById('vCode').value.toUpperCase(),
+                discount_type: document.getElementById('vType').value,
+                discount_value: parseFloat(document.getElementById('vVal').value),
+                min_order_value: parseFloat(document.getElementById('vMin').value),
+                max_discount: parseFloat(document.getElementById('vMax').value),
+                usage_limit: parseInt(document.getElementById('vLimit').value)
+            };
+            try {
+                if(editingVoucherId) {
+                    await apiCall(`/vouchers/${editingVoucherId}`, 'PUT', body);
+                    showToast("Đã cập nhật Voucher!");
+                    cancelEditVoucher();
+                } else {
+                    await apiCall(`/vouchers?shop_id=${currentShopId}`, 'POST', body);
+                    showToast("Đã tạo Voucher thành công!");
+                    cancelEditVoucher();
+                }
+                loadVouchers();
+            } catch(e) { showToast(e.message); }
+        }
+
+        async function deleteVoucher(id) {
+            if(!confirm("Bạn có chắc muốn xóa Voucher này?")) return;
+            try {
+                await apiCall(`/vouchers/${id}`, 'DELETE');
+                showToast("Đã xóa Voucher!");
+                loadVouchers();
+            } catch(e) { showToast(e.message); }
+        }
+
+        async function downloadExcel() {
+            if(!dashboardShopId) return showToast("Vui lòng chọn cửa hàng trước");
+            window.open(`/api/export/seller/${dashboardShopId}?token=${localStorage.getItem('token')}`);
+        }
+
+        init();
+    </script>
+</body>
+</html>
