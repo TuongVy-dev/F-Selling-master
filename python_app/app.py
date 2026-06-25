@@ -1,13 +1,18 @@
+# Force reload to recreate admin seed user
 import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status, Header, File, UploadFile, Form, Query
 import shutil
 import os
+import uuid
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 import database, models
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 import jwt
 from datetime import datetime, timedelta
 import bcrypt
@@ -15,8 +20,24 @@ from typing import List, Optional
 import io
 import re
 import openpyxl
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.responses import StreamingResponse, FileResponse, RedirectResponse
 from contextlib import asynccontextmanager
+
+# Load .env file manually
+def load_dotenv():
+    if os.path.exists(".env"):
+        with open(".env", "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    parts = line.split("=", 1)
+                    if len(parts) == 2:
+                        key, val = parts[0].strip(), parts[1].strip()
+                        if (val.startswith('"') and val.endswith('"')) or (val.startswith("'") and val.endswith("'")):
+                            val = val[1:-1]
+                        os.environ[key] = val
+
+load_dotenv()
 
 # Initialize DB
 models.Base.metadata.create_all(bind=database.engine)
@@ -37,6 +58,49 @@ async def lifespan(app: FastAPI):
     try:
         from sqlalchemy import text
         db.execute(text("ALTER TABLE products ADD COLUMN is_active BOOLEAN DEFAULT 1"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
+    # User table migrations
+    try:
+        from sqlalchemy import text
+        db.execute(text("ALTER TABLE users ADD COLUMN email VARCHAR(255)"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
+    try:
+        from sqlalchemy import text
+        db.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_users_email ON users(email)"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
+    try:
+        from sqlalchemy import text
+        db.execute(text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT 0"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
+    try:
+        from sqlalchemy import text
+        db.execute(text("ALTER TABLE users ADD COLUMN session_id VARCHAR(255)"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
+    try:
+        from sqlalchemy import text
+        db.execute(text("ALTER TABLE users ADD COLUMN verification_code VARCHAR(255)"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
+    try:
+        from sqlalchemy import text
+        db.execute(text("ALTER TABLE users ADD COLUMN verification_code_expires DATETIME"))
         db.commit()
     except Exception:
         db.rollback()
@@ -63,11 +127,38 @@ app.add_middleware(
 SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 
+def log_to_file(msg: str):
+    try:
+        with open("g:/F-Selling-master/python_app/request_log.txt", "a", encoding="utf-8") as f:
+            f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}\n")
+    except Exception as e:
+        print(f"Error logging to file: {e}")
+
 # Pydantic Schemas
 class UserCreate(BaseModel):
     username: str
     password: str
+    email: EmailStr
     role: str = "SELLER"
+
+class EmailVerify(BaseModel):
+    email: str
+    code: str
+
+class ResendCodeRequest(BaseModel):
+    email: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ForgotPasswordReset(BaseModel):
+    email: str
+    code: str
+    new_password: str
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
 
 class Login(BaseModel):
     username: str
@@ -122,20 +213,33 @@ def get_db():
         db.close()
 
 def get_current_user(authorization: str = Header(None), token: str = Query(None), db: Session = Depends(get_db)):
+    log_to_file(f"Auth check: auth_header={authorization[:30] if authorization else 'None'} query_token={token[:30] if token else 'None'}")
     if authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ")[1]
     if not token:
+        log_to_file("Auth failed: Token missing")
         raise HTTPException(status_code=401, detail="Invalid token")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
+        sid: str = payload.get("sid")
         if username is None:
+            log_to_file("Auth failed: sub is None")
             raise HTTPException(status_code=401, detail="Invalid token")
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as e:
+        log_to_file(f"Auth failed: PyJWTError: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
     user = db.query(models.User).filter(models.User.username == username).first()
     if user is None:
+        log_to_file(f"Auth failed: User not found: '{username}'")
         raise HTTPException(status_code=401, detail="User not found")
+    
+    # Kiểm tra Session ID để đảm bảo đăng xuất thiết bị cũ
+    if user.session_id and sid != user.session_id:
+        log_to_file(f"Auth failed: session_id mismatch for user '{username}' (DB={user.session_id}, Token={sid})")
+        raise HTTPException(status_code=401, detail="Tài khoản đã được đăng nhập ở thiết bị khác. Vui lòng đăng nhập lại.")
+        
+    log_to_file(f"Auth success: user='{username}' (ID={user.id})")
     return user
 
 def log_system_action(db: Session, user_id: int, action: str, details: str = ""):
@@ -147,9 +251,56 @@ def log_system_action(db: Session, user_id: int, action: str, details: str = "")
         print(f"Error logging action: {e}")
         db.rollback()
 
+def send_otp_email(email_to: str, otp_code: str, subject: str = "F-Selling: Mã xác minh của bạn"):
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+
+    if not smtp_user or not smtp_password:
+        print("\n" + "="*80)
+        print(f" WARNING: SMTP EMAIL NOT CONFIGURRED. BACKUP OTP FOR {email_to}: {otp_code}")
+        print("="*80 + "\n")
+        return False
+
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = smtp_user
+        msg['To'] = email_to
+        msg['Subject'] = subject
+
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #4F46E5;">Mã xác minh F-Selling</h2>
+            <p>Chào bạn,</p>
+            <p>Mã xác minh (OTP) của bạn là:</p>
+            <div style="font-size: 24px; font-weight: bold; background: #F3F4F6; padding: 10px 20px; border-radius: 8px; display: inline-block; letter-spacing: 2px; color: #4F46E5; margin: 15px 0;">
+                {otp_code}
+            </div>
+            <p>Mã này có hiệu lực trong vòng 15 phút. Vui lòng không chia sẻ mã này với bất kỳ ai.</p>
+            <hr style="border: none; border-top: 1px solid #E5E7EB; margin-top: 30px;">
+            <p style="font-size: 12px; color: #9CA3AF;">Hệ thống F-Selling - Ứng dụng bán hàng thông minh.</p>
+        </body>
+        </html>
+        """
+        msg.attach(MIMEText(body, 'html', 'utf-8'))
+
+        server = smtplib.SMTP(smtp_host, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.sendmail(smtp_user, email_to, msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Error sending mail to {email_to}: {e}")
+        print("\n" + "="*80)
+        print(f" BACKUP OTP FOR {email_to}: {otp_code} (Mail sending failed: {e})")
+        print("="*80 + "\n")
+        return False
+
 @app.post("/api/auth/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
-    # Password validation: must contain uppercase, lowercase, digit, and special char
     if not (re.search(r"[A-Z]", user.password) and 
             re.search(r"[a-z]", user.password) and 
             re.search(r"\d", user.password) and 
@@ -157,28 +308,161 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Mật khẩu phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số")
         
     if db.query(models.User).filter(models.User.username == user.username).first():
-        raise HTTPException(status_code=400, detail="Username already registered")
+        raise HTTPException(status_code=400, detail="Tên đăng nhập đã tồn tại")
         
+    if db.query(models.User).filter(models.User.email == user.email).first():
+        raise HTTPException(status_code=400, detail="Email này đã được đăng ký tài khoản khác")
+
     hashed_pw = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    db_user = models.User(username=user.username, hashed_password=hashed_pw, role=user.role)
+    
+    import random
+    otp_code = f"{random.randint(100000, 999999)}"
+    expiry = datetime.utcnow() + timedelta(minutes=15)
+    
+    db_user = models.User(
+        username=user.username, 
+        hashed_password=hashed_pw, 
+        role=user.role,
+        email=user.email,
+        is_verified=False,
+        verification_code=otp_code,
+        verification_code_expires=expiry
+    )
     db.add(db_user)
     db.commit()
-    return {"msg": "User created successfully"}
+    
+    send_otp_email(user.email, otp_code, "F-Selling: Xác minh tài khoản mới")
+    return {"msg": "Đăng ký thành công. Vui lòng kiểm tra email để nhận mã kích hoạt tài khoản."}
+
+@app.post("/api/auth/verify-email")
+def verify_email(data: EmailVerify, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản với email này")
+    if user.is_verified:
+        return {"msg": "Tài khoản đã được xác minh trước đó."}
+    
+    if not user.verification_code or user.verification_code != data.code:
+        raise HTTPException(status_code=400, detail="Mã xác thực không hợp lệ")
+        
+    if user.verification_code_expires and datetime.utcnow() > user.verification_code_expires:
+        raise HTTPException(status_code=400, detail="Mã xác thực đã hết hạn")
+        
+    user.is_verified = True
+    user.verification_code = None
+    user.verification_code_expires = None
+    db.commit()
+    return {"msg": "Xác minh tài khoản thành công! Bây giờ bạn đã có thể đăng nhập."}
+
+@app.post("/api/auth/resend-code")
+def resend_code(data: ResendCodeRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản với email này")
+    if user.is_verified:
+        raise HTTPException(status_code=400, detail="Tài khoản đã được xác minh")
+        
+    import random
+    otp_code = f"{random.randint(100000, 999999)}"
+    user.verification_code = otp_code
+    user.verification_code_expires = datetime.utcnow() + timedelta(minutes=15)
+    db.commit()
+    
+    send_otp_email(user.email, otp_code, "F-Selling: Gửi lại mã xác minh tài khoản")
+    return {"msg": "Đã gửi lại mã xác minh mới vào email của bạn."}
+
+@app.post("/api/auth/forgot-password-request")
+def forgot_password_request(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản liên kết với email này")
+        
+    import random
+    otp_code = f"{random.randint(100000, 999999)}"
+    user.verification_code = otp_code
+    user.verification_code_expires = datetime.utcnow() + timedelta(minutes=15)
+    db.commit()
+    
+    send_otp_email(user.email, otp_code, "F-Selling: Mã khôi phục mật khẩu")
+    return {"msg": "Đã gửi mã xác minh khôi phục mật khẩu vào email của bạn."}
+
+@app.post("/api/auth/forgot-password-reset")
+def forgot_password_reset(data: ForgotPasswordReset, db: Session = Depends(get_db)):
+    if not (re.search(r"[A-Z]", data.new_password) and 
+            re.search(r"[a-z]", data.new_password) and 
+            re.search(r"\d", data.new_password) and 
+            re.search(r"[!@#$%^&*(),.?\":{}|<>]", data.new_password)):
+        raise HTTPException(status_code=400, detail="Mật khẩu phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số")
+
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản với email này")
+        
+    if not user.verification_code or user.verification_code != data.code:
+        raise HTTPException(status_code=400, detail="Mã xác nhận không hợp lệ")
+        
+    if user.verification_code_expires and datetime.utcnow() > user.verification_code_expires:
+        raise HTTPException(status_code=400, detail="Mã xác nhận đã hết hạn")
+        
+    hashed_pw = bcrypt.hashpw(data.new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    user.hashed_password = hashed_pw
+    user.verification_code = None
+    user.verification_code_expires = None
+    user.session_id = uuid.uuid4().hex # Logout các nơi khác
+    db.commit()
+    return {"msg": "Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại."}
+
+@app.post("/api/auth/change-password")
+def change_password(data: ChangePasswordRequest, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    if not bcrypt.checkpw(data.old_password.encode('utf-8'), current_user.hashed_password.encode('utf-8')):
+        raise HTTPException(status_code=400, detail="Mật khẩu hiện tại không chính xác")
+        
+    if not (re.search(r"[A-Z]", data.new_password) and 
+            re.search(r"[a-z]", data.new_password) and 
+            re.search(r"\d", data.new_password) and 
+            re.search(r"[!@#$%^&*(),.?\":{}|<>]", data.new_password)):
+        raise HTTPException(status_code=400, detail="Mật khẩu mới phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số")
+        
+    hashed_pw = bcrypt.hashpw(data.new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    current_user.hashed_password = hashed_pw
+    
+    new_sid = uuid.uuid4().hex
+    current_user.session_id = new_sid
+    db.commit()
+    
+    access_token_expires = timedelta(minutes=1440)
+    expire = datetime.utcnow() + access_token_expires
+    to_encode = {"sub": current_user.username, "exp": expire, "sid": new_sid}
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    
+    log_system_action(db, current_user.id, "CHANGE_PASSWORD", f"User {current_user.username} changed password")
+    return {"access_token": encoded_jwt, "token_type": "bearer", "role": current_user.role}
 
 @app.post("/api/auth/login", response_model=Token)
 def login(user: Login, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if not db_user or not bcrypt.checkpw(user.password.encode('utf-8'), db_user.hashed_password.encode('utf-8')):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Tên đăng nhập hoặc mật khẩu không chính xác")
+        
+    if db_user.email and not db_user.is_verified:
+        raise HTTPException(status_code=400, detail="Tài khoản chưa được xác minh email. Vui lòng xác minh trước khi đăng nhập.")
+        
+    new_sid = uuid.uuid4().hex
+    db_user.session_id = new_sid
+    db.commit()
     
     access_token_expires = timedelta(minutes=1440)
     expire = datetime.utcnow() + access_token_expires
-    to_encode = {"sub": db_user.username, "exp": expire}
+    to_encode = {"sub": db_user.username, "exp": expire, "sid": new_sid}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     
     log_system_action(db, db_user.id, "LOGIN", f"User {db_user.username} logged in")
-    
+    log_to_file(f"Login success: user='{user.username}' (ID={db_user.id}) -> sid={new_sid}")
     return {"access_token": encoded_jwt, "token_type": "bearer", "role": db_user.role}
+
+@app.get("/api/auth/session-check")
+def session_check(current_user: models.User = Depends(get_current_user)):
+    return {"status": "ok"}
 
 # --- SELLER APIs ---
 @app.post("/api/shops")
@@ -235,7 +519,12 @@ def toggle_shop_status(shop_id: int, db: Session = Depends(get_db), current_user
 
 @app.get("/api/shops")
 def get_shops(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    return db.query(models.Shop).filter(models.Shop.owner_id == current_user.id).all()
+    log_to_file(f"get_shops requested by user='{current_user.username}' (ID={current_user.id})")
+    shops = db.query(models.Shop).filter(models.Shop.owner_id == current_user.id).all()
+    log_to_file(f"get_shops DB query returned: {[s.id for s in shops]}")
+    print(f"DEBUG: get_shops called by user '{current_user.username}' (ID: {current_user.id})")
+    print(f"DEBUG: shops returned: {[s.id for s in shops]}")
+    return shops
 
 @app.post("/api/categories")
 def create_category(name: str, shop_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
@@ -447,14 +736,22 @@ def get_seller_dashboard(shop_id: int, db: Session = Depends(get_db), current_us
 # --- ADMIN APIs ---
 @app.get("/api/dashboard/admin")
 def get_admin_dashboard(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    log_to_file(f"get_admin_dashboard requested by user='{current_user.username}' (role={current_user.role})")
+    print(f"DEBUG: get_admin_dashboard called by user '{current_user.username}' (role: {current_user.role})")
     if current_user.role != "ADMIN":
+        log_to_file(f"get_admin_dashboard ACCESS DENIED for user='{current_user.username}' (role={current_user.role})")
+        print(f"DEBUG: Access denied for role {current_user.role}")
         raise HTTPException(status_code=403, detail="Admin only")
     
     shops = db.query(models.Shop).all()
+    log_to_file(f"get_admin_dashboard: Found {len(shops)} shops in DB")
+    print(f"DEBUG: Found {len(shops)} shops in DB")
     res = []
     for s in shops:
         rev = db.query(func.sum(models.Order.total_amount)).filter(models.Order.shop_id == s.id, models.Order.status == "PAID").scalar() or 0
         res.append({"shop_name": s.name, "total_revenue": rev})
+    log_to_file(f"get_admin_dashboard: Returning {len(res)} items")
+    print(f"DEBUG: Returning res with {len(res)} items")
     return res
 
 @app.get("/api/shops/{shop_id}/stats")
@@ -562,35 +859,88 @@ def export_seller_excel(shop_id: int, db: Session = Depends(get_db), current_use
     
     return StreamingResponse(out, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": "attachment; filename=seller_transactions.xlsx"})
 
-@app.get("/")
-def root():
-    return {
-        "message": "API root. Use /api/... endpoints.",
-        "api": "/api"
-    }
-
-@app.get("/api")
-def api_root():
-    return {
-        "message": "API is running.",
-        "endpoints": [
-            "/api/auth/register",
-            "/api/auth/login",
-            "/api/shops",
-            "/api/categories/{shop_id}",
-            "/api/products/{shop_id}"
-        ]
-    }
-
-@app.get("/admin")
-def admin_page():
+# --- Clean URL Routes for HTML Pages ---
+@app.get("/admin", response_class=FileResponse)
+def get_admin():
     return FileResponse("static/admin.html")
 
-@app.get("/seller")
-def seller_page():
+@app.get("/pos", response_class=FileResponse)
+def get_pos():
+    return FileResponse("static/pos.html")
+
+@app.get("/register", response_class=FileResponse)
+def get_register():
+    return FileResponse("static/register.html")
+
+@app.get("/seller", response_class=FileResponse)
+def get_seller():
     return FileResponse("static/seller.html")
 
-app.mount("/", StaticFiles(directory="static", html=False), name="static")
+@app.get("/verify", response_class=FileResponse)
+def get_verify():
+    return FileResponse("static/verify.html")
+
+# --- Redirect old HTML URLs to Clean URLs ---
+@app.get("/admin.html")
+def redirect_admin():
+    return RedirectResponse(url="/admin", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+@app.get("/pos.html")
+def redirect_pos():
+    return RedirectResponse(url="/pos", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+@app.get("/register.html")
+def redirect_register():
+    return RedirectResponse(url="/register", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+@app.get("/seller.html")
+def redirect_seller():
+    return RedirectResponse(url="/seller", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+@app.get("/verify.html")
+def redirect_verify():
+    return RedirectResponse(url="/verify", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+@app.get("/index.html")
+def redirect_index():
+    return RedirectResponse(url="/", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+@app.get("/index")
+def redirect_index_clean():
+    return RedirectResponse(url="/", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
+    # Automatic Ngrok integration
+    try:
+        from pyngrok import ngrok
+        try:
+            public_url = ngrok.connect(8000).public_url
+            print("\n" + "="*70)
+            print(" NGROK REMOTE ACCESS TUNNEL OPENED:")
+            print(f" -> {public_url}")
+            print("="*70 + "\n")
+        except Exception as e:
+            error_msg = str(e)
+            if "authtoken" in error_msg.lower() or "authentication" in error_msg.lower():
+                print("\n" + "="*70)
+                print("Ngrok requires Authtoken for remote access.")
+                print("Register for a free account and get your token at: https://dashboard.ngrok.com/get-started/your-authtoken")
+                print("="*70)
+                token = input("Enter your Ngrok Authtoken: ").strip()
+                if token:
+                    ngrok.set_auth_token(token)
+                    public_url = ngrok.connect(8000).public_url
+                    print("\n" + "="*70)
+                    print(" NGROK REMOTE ACCESS TUNNEL OPENED:")
+                    print(f" -> {public_url}")
+                    print("="*70 + "\n")
+                else:
+                    print("Skipping Ngrok. Running locally...")
+            else:
+                print(f"Skipping Ngrok due to connection error: {e}")
+    except ImportError:
+        print("pyngrok library not found. Running locally...")
+
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)

@@ -6,3 +6,5 @@ pyjwt
 passlib[bcrypt]
 pydantic
 python-multipart
+pyngrok
+email-validator

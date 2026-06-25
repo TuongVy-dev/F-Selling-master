@@ -1,7 +1,17 @@
 const BASE_URL = '/api';
+let cachedToken = localStorage.getItem('token');
+
+// Ghi đè localStorage.setItem để cập nhật cachedToken riêng cho tab này
+const originalSetItem = localStorage.setItem;
+localStorage.setItem = function(key, value) {
+    if (key === 'token') {
+        cachedToken = value;
+    }
+    originalSetItem.apply(this, arguments);
+};
 
 function getToken() {
-    return localStorage.getItem('token');
+    return cachedToken;
 }
 
 async function apiCall(endpoint, method = 'GET', body = null) {
@@ -21,8 +31,11 @@ async function apiCall(endpoint, method = 'GET', body = null) {
 
     const res = await fetch(`${BASE_URL}${endpoint}`, options);
     if (res.status === 401) {
-        localStorage.clear();
-        window.location.href = '/index.html';
+        // Chỉ xóa localStorage nếu token hiện tại trong localStorage trùng với token cũ của tab này
+        if (localStorage.getItem('token') === cachedToken) {
+            localStorage.clear();
+        }
+        window.location.href = '/';
         return;
     }
     
@@ -53,5 +66,35 @@ function showToast(msg) {
 
 function logout() {
     localStorage.clear();
-    window.location.href = '/index.html';
+    window.location.href = '/';
 }
+
+// Tự động phát hiện khi đăng nhập ở tab khác trên cùng trình duyệt (Lập tức logout tab cũ)
+window.addEventListener('storage', (e) => {
+    if (e.key === 'token') {
+        if (e.newValue !== cachedToken) {
+            window.location.href = '/';
+        }
+    }
+});
+
+// Định kỳ kiểm tra phiên đăng nhập với server (Lập tức logout nếu đăng nhập ở thiết bị/trình duyệt khác)
+setInterval(async () => {
+    const token = getToken();
+    if (token) {
+        try {
+            const res = await fetch(`${BASE_URL}/auth/session-check`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+                cache: 'no-store'
+            });
+            if (res.status === 401) {
+                if (localStorage.getItem('token') === cachedToken) {
+                    localStorage.clear();
+                }
+                window.location.href = '/';
+            }
+        } catch (e) {
+            // Lỗi mạng tạm thời, bỏ qua để tránh logout nhầm
+        }
+    }
+}, 3000); // Kiểm tra mỗi 3 giây để đảm bảo phản hồi gần như tức thì

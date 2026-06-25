@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác thực Email | F-Selling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .verify-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .verify-box {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        .otp-inputs {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+        .otp-field {
+            width: 3.5rem;
+            height: 3.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            background: #F1F5F9;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 0;
+            transition: all 0.3s ease;
+        }
+        .otp-field:focus {
+            border-color: var(--primary);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="glass-card verify-box">
+            <h1 class="text-gradient">Xác thực tài khoản</h1>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                Chúng tôi đã gửi mã xác thực gồm 6 chữ số vào địa chỉ email của bạn:
+            </p>
+            <p id="targetEmail" style="font-weight: 600; color: var(--text-main); margin-bottom: 1.5rem; word-break: break-all;"></p>
+            
+            <form id="verifyForm">
+                <div class="otp-inputs">
+                    <input type="text" class="otp-field" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-field" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-field" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-field" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-field" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="otp-field" maxlength="1" pattern="[0-9]" required>
+                </div>
+                
+                <button type="submit" style="width: 100%; margin-top: 1rem;">Xác thực tài khoản</button>
+                <div id="errorMsg" style="color: #ef4444; margin-top: 1rem; text-align: center;"></div>
+                <div id="successMsg" style="color: var(--success); margin-top: 1rem; text-align: center; font-weight: 600;"></div>
+            </form>
+            
+            <div style="text-align: center; margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    Không nhận được mã? 
+                    <a href="#" id="resendBtn" style="color: var(--primary); font-weight: 600; text-decoration: none;">Gửi lại mã mới</a>
+                </p>
+                <p style="font-size: 0.9rem; margin-top: 0.75rem;">
+                    <a href="/" style="color: var(--text-muted); text-decoration: none;"><i class="ph ph-arrow-left"></i> Quay về Đăng nhập</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phosphor Icons for arrow icon -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="/js/api.js"></script>
+    <script>
+        const registerEmail = localStorage.getItem('register_email') || 'your-email@example.com';
+        document.getElementById('targetEmail').innerText = registerEmail;
+
+        // Auto focus flow for OTP fields
+        const otpFields = document.querySelectorAll('.otp-field');
+        otpFields.forEach((field, index) => {
+            field.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < otpFields.length - 1) {
+                    otpFields[index + 1].focus();
+                }
+            });
+            field.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                    otpFields[index - 1].focus();
+                }
+            });
+            // Handle paste of whole 6-digit OTP code
+            field.addEventListener('paste', (e) => {
+                const pasteData = e.clipboardData.getData('text');
+                if (pasteData.length === 6 && /^\d+$/.test(pasteData)) {
+                    otpFields.forEach((f, i) => {
+                        f.value = pasteData[i];
+                    });
+                    otpFields[5].focus();
+                    e.preventDefault();
+                }
+            });
+        });
+
+        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            errorMsg.innerText = '';
+            successMsg.innerText = '';
+
+            // Get combined code
+            let code = '';
+            otpFields.forEach(f => code += f.value);
+
+            try {
+                const res = await apiCall('/auth/verify-email', 'POST', {
+                    email: registerEmail,
+                    code: code
+                });
+                successMsg.innerText = res.msg;
+                alert(res.msg);
+                localStorage.removeItem('register_email');
+                window.location.href = '/';
+            } catch (err) {
+                errorMsg.innerText = err.message;
+            }
+        });
+
+        document.getElementById('resendBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            errorMsg.innerText = '';
+            successMsg.innerText = '';
+
+            try {
+                const res = await apiCall('/auth/resend-code', 'POST', {
+                    email: registerEmail
+                });
+                successMsg.innerText = res.msg;
+                // Clear fields
+                otpFields.forEach(f => f.value = '');
+                otpFields[0].focus();
+            } catch (err) {
+                errorMsg.innerText = err.message;
+            }
+        });
+    </script>
+</body>
+</html>

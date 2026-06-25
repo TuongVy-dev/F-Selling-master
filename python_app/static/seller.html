@@ -40,6 +40,7 @@
         <h2 class="text-gradient">Quản trị Cửa hàng</h2>
         <div class="flex-row" style="gap: 1rem; align-items: center;">
             <button onclick="openPosShopSelector()" style="display: flex; align-items: center; gap: 0.3rem; background: var(--primary);"><i class="ph ph-shopping-cart"></i> Mở POS Bán Hàng</button>
+            <button class="btn-outline" onclick="showChangePasswordModal()" style="display: flex; align-items: center; gap: 0.3rem;"><i class="ph ph-key"></i> Đổi mật khẩu</button>
             <button class="btn-outline" onclick="logout()" style="display: flex; align-items: center; gap: 0.3rem;"><i class="ph ph-sign-out"></i> Đăng xuất</button>
         </div>
     </div>
@@ -519,7 +520,7 @@
 
         function goToPOS(id) {
             localStorage.setItem('currentShopId', id);
-            window.location.href = '/pos.html';
+            window.location.href = '/pos';
         }
 
         function changeShop(id) {
@@ -869,7 +870,81 @@
             window.open(`/api/export/seller/${dashboardShopId}?token=${localStorage.getItem('token')}`);
         }
 
+        // ĐỔI MẬT KHẨU
+        function showChangePasswordModal() {
+            document.getElementById('changePasswordModal').style.display = 'flex';
+            document.getElementById('changePasswordErrorMsg').innerText = '';
+            document.getElementById('changePasswordSuccessMsg').innerText = '';
+            document.getElementById('oldPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmNewPassword').value = '';
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').style.display = 'none';
+        }
+
+        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const old_password = document.getElementById('oldPassword').value;
+            const new_password = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmNewPassword').value;
+            const errorMsg = document.getElementById('changePasswordErrorMsg');
+            const successMsg = document.getElementById('changePasswordSuccessMsg');
+            errorMsg.innerText = '';
+            successMsg.innerText = '';
+            
+            if (new_password !== confirm) {
+                errorMsg.innerText = "Mật khẩu mới xác nhận không khớp!";
+                return;
+            }
+            
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?\":{}|<>_]).+$/;
+            if (!regex.test(new_password)) {
+                errorMsg.innerText = "Mật khẩu mới phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số!";
+                return;
+            }
+            
+            try {
+                const res = await apiCall('/auth/change-password', 'POST', { old_password, new_password });
+                successMsg.innerText = "Đổi mật khẩu thành công!";
+                localStorage.setItem('token', res.access_token);
+                alert("Đổi mật khẩu thành công!");
+                closeChangePasswordModal();
+            } catch (err) {
+                errorMsg.innerText = err.message;
+            }
+        });
+
         init();
     </script>
+
+    <!-- Modal Đổi Mật Khẩu -->
+    <div id="changePasswordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="glass-card" style="max-width: 400px; width: 90%; background: var(--card-bg); text-align: center; position: relative;">
+            <button onclick="closeChangePasswordModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; box-shadow: none; padding: 0;">&times;</button>
+            
+            <h3 class="text-gradient" style="margin-top: 1rem;">Đổi mật khẩu</h3>
+            
+            <form id="changePasswordForm">
+                <div style="text-align: left;">
+                    <label style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">Mật khẩu hiện tại</label>
+                    <input type="password" id="oldPassword" required>
+                </div>
+                <div style="text-align: left;">
+                    <label style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">Mật khẩu mới</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div style="text-align: left;">
+                    <label style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">Xác nhận mật khẩu mới</label>
+                    <input type="password" id="confirmNewPassword" required>
+                </div>
+                <button type="submit" style="width: 100%; margin-top: 0.5rem;">Cập nhật mật khẩu</button>
+            </form>
+            
+            <div id="changePasswordErrorMsg" style="color: #ef4444; margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+            <div id="changePasswordSuccessMsg" style="color: var(--success); margin-top: 1rem; text-align: center; font-weight: 600; font-size: 0.9rem;"></div>
+        </div>
+    </div>
 </body>
 </html>

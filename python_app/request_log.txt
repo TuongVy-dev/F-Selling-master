@@ -1,0 +1,42 @@
+[2026-06-24 19:19:50] Login success: user='admin' (ID=1) -> sid=06107247430247338f9f20c20ec91aba
+[2026-06-24 19:19:53] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:19:53] Auth success: user='admin' (ID=1)
+[2026-06-24 19:19:54] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:19:54] Auth success: user='admin' (ID=1)
+[2026-06-24 19:20:10] Login success: user='nhutdi' (ID=2) -> sid=c07947d196e448eaa33fa840b384eaec
+[2026-06-24 19:21:50] Login success: user='nhutdi' (ID=2) -> sid=ba0db8fc24534eb0ad230b512a79b2aa
+[2026-06-24 19:24:28] Login success: user='admin' (ID=1) -> sid=285c8250a42d4e2c99af29ba00eed839
+[2026-06-24 19:24:29] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:24:29] Auth success: user='admin' (ID=1)
+[2026-06-24 19:25:00] Login success: user='admin' (ID=1) -> sid=7ebc1c38f42a44cc93c95f60327d6f11
+[2026-06-24 19:27:01] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:01] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:08] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:08] Auth failed: session_id mismatch for user 'admin' (DB=7ebc1c38f42a44cc93c95f60327d6f11, Token=285c8250a42d4e2c99af29ba00eed839)
+[2026-06-24 19:27:08] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:08] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:11] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:11] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:14] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:14] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:16] Login success: user='admin' (ID=1) -> sid=a977d9b710fe4421b613dbf1c994d28c
+[2026-06-24 19:27:17] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:17] Auth failed: session_id mismatch for user 'admin' (DB=a977d9b710fe4421b613dbf1c994d28c, Token=7ebc1c38f42a44cc93c95f60327d6f11)
+[2026-06-24 19:27:19] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:19] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:22] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:22] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:25] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:25] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:28] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:28] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:31] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:31] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:34] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:34] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:37] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:37] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:40] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:40] Auth success: user='admin' (ID=1)
+[2026-06-24 19:27:43] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-24 19:27:43] Auth success: user='admin' (ID=1)
