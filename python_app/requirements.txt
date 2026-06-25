@@ -8,3 +8,4 @@ pydantic
 python-multipart
 pyngrok
 email-validator
+apscheduler

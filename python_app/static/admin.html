@@ -6,6 +6,7 @@
     <title>Bảng điều khiển Admin | F-Selling</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <style>
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
@@ -19,7 +20,8 @@
 </head>
 <body>
     <div class="nav-bar">
-        <h2 class="text-gradient">Quản trị viên F-Selling</h2>
+        <!-- <h2 class="text-gradient">Quản trị viên F-Selling</h2> -->
+        <img class="logo" src="img/logo.png" alt="">
         <div class="flex-row">
             <button onclick="downloadExcel()">Xuất Excel</button>
             <button class="btn-outline" onclick="showChangePasswordModal()">Đổi mật khẩu</button>
@@ -159,39 +161,44 @@
             document.getElementById('changePasswordModal').style.display = 'none';
         }
 
-        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const old_password = document.getElementById('oldPassword').value;
-            const new_password = document.getElementById('newPassword').value;
-            const confirm = document.getElementById('confirmNewPassword').value;
-            const errorMsg = document.getElementById('changePasswordErrorMsg');
-            const successMsg = document.getElementById('changePasswordSuccessMsg');
-            errorMsg.innerText = '';
-            successMsg.innerText = '';
-            
-            if (new_password !== confirm) {
-                errorMsg.innerText = "Mật khẩu mới xác nhận không khớp!";
-                return;
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('changePasswordForm');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const old_password = document.getElementById('oldPassword').value;
+                    const new_password = document.getElementById('newPassword').value;
+                    const confirm = document.getElementById('confirmNewPassword').value;
+                    const errorMsg = document.getElementById('changePasswordErrorMsg');
+                    const successMsg = document.getElementById('changePasswordSuccessMsg');
+                    errorMsg.innerText = '';
+                    successMsg.innerText = '';
+                    
+                    if (new_password !== confirm) {
+                        errorMsg.innerText = "Mật khẩu mới xác nhận không khớp!";
+                        return;
+                    }
+                    
+                    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?\":{}|<>_]).+$/;
+                    if (!regex.test(new_password)) {
+                        errorMsg.innerText = "Mật khẩu mới phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số!";
+                        return;
+                    }
+                    
+                    try {
+                        const res = await apiCall('/auth/change-password', 'POST', { old_password, new_password });
+                        successMsg.innerText = "Đổi mật khẩu thành công!";
+                        localStorage.setItem('token', res.access_token);
+                        alert("Đổi mật khẩu thành công!");
+                        closeChangePasswordModal();
+                    } catch (err) {
+                        errorMsg.innerText = err.message;
+                    }
+                });
             }
-            
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?\":{}|<>_]).+$/;
-            if (!regex.test(new_password)) {
-                errorMsg.innerText = "Mật khẩu mới phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số!";
-                return;
-            }
-            
-            try {
-                const res = await apiCall('/auth/change-password', 'POST', { old_password, new_password });
-                successMsg.innerText = "Đổi mật khẩu thành công!";
-                localStorage.setItem('token', res.access_token);
-                alert("Đổi mật khẩu thành công!");
-                closeChangePasswordModal();
-            } catch (err) {
-                errorMsg.innerText = err.message;
-            }
-        });
 
-        loadDashboard();
+            loadDashboard();
+        });
     </script>
 
     <!-- Modal Đổi Mật Khẩu -->

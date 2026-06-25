@@ -6,23 +6,12 @@
     <title>F-Selling | Đăng ký</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .login-box {
-            width: 100%;
-            max-width: 400px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
     <div class="login-container">
         <div class="glass-card login-box">
-            <h1 class="text-gradient" style="text-align: center;">F-Selling</h1>
+            <img class="logo" src="img/logo.png" alt="">
             <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Đăng ký tài khoản Người bán mới</p>
             
             <form id="registerForm">
@@ -59,6 +48,7 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirm = document.getElementById('confirm_password').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
             
             if(password !== confirm) {
                 return document.getElementById('errorMsg').innerText = "Mật khẩu xác nhận không khớp!";
@@ -71,7 +61,9 @@
 
             try {
                 await apiCall('/auth/register', 'POST', { username, email, password, role: 'SELLER' });
+                submitBtn.disabled = true;
                 localStorage.setItem('register_email', email);
+                localStorage.setItem('otp_send_time', Date.now().toString());
                 alert("Đăng ký thành công! Đang chuyển hướng về trang xác thực tài khoản...");
                 window.location.href = "/verify";
             } catch (err) {

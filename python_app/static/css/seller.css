@@ -1,0 +1,37 @@
+ .tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+.tab-btn {
+    background: transparent; border: none; color: var(--text-muted); padding: 0.75rem 1.25rem;
+    font-size: 1rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+}
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.db-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+.db-table th, .db-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+.db-table th { background: #F8FAFC; font-weight: 600; color: var(--text-muted); }
+
+.shop-switcher {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: white; padding: 0.5rem 1rem; border-radius: 8px; outline: none;
+    cursor: pointer; font-weight: 600; appearance: auto;
+}
+.shop-switcher option { background: #1E293B; color: white; }
+
+.shop-list-card {
+    background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px;
+    padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;
+}
+.shop-list-card h4 { margin: 0; color: var(--text-main); }
+
+.tab-btn:hover {
+   background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px -1px rgba(249, 115, 22, 0.3);
+    color: white;
+}
+
+.logo{
+    height: 50px;
+    width: auto;
+}
+    

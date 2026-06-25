@@ -14,7 +14,7 @@ from sqlalchemy import func
 import database, models
 from pydantic import BaseModel, EmailStr
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import bcrypt
 from typing import List, Optional
 import io
@@ -22,6 +22,7 @@ import re
 import openpyxl
 from fastapi.responses import StreamingResponse, FileResponse, RedirectResponse
 from contextlib import asynccontextmanager
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # Load .env file manually
 def load_dotenv():
@@ -41,6 +42,30 @@ load_dotenv()
 
 # Initialize DB
 models.Base.metadata.create_all(bind=database.engine)
+
+# Background task to clean up expired unverified users
+def cleanup_expired_unverified_users():
+    """Remove unverified users whose verification window has expired (5 minutes)"""
+    db = database.SessionLocal()
+    try:
+        current_time = datetime.utcnow()
+        expired_users = db.query(models.User).filter(
+            models.User.is_verified == False,
+            models.User.verification_code_expires < current_time
+        ).all()
+        
+        for user in expired_users:
+            print(f"[CLEANUP] Deleting unverified user: {user.username} (email: {user.email})")
+            db.delete(user)
+        
+        if expired_users:
+            db.commit()
+            print(f"[CLEANUP] Removed {len(expired_users)} expired unverified user(s)")
+    except Exception as e:
+        print(f"[CLEANUP] Error cleaning up expired users: {e}")
+        db.rollback()
+    finally:
+        db.close()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -112,7 +137,18 @@ async def lifespan(app: FastAPI):
         db.add(admin_user)
         db.commit()
     db.close()
+    
+    # Start background scheduler to clean up expired unverified users
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(cleanup_expired_unverified_users, "interval", minutes=1)
+    scheduler.start()
+    print("[SCHEDULER] Background cleanup task started - runs every 1 minute")
+    
     yield
+    
+    # Shutdown scheduler
+    scheduler.shutdown()
+    print("[SCHEDULER] Background cleanup task stopped")
 
 app = FastAPI(title="F-Selling Backend", lifespan=lifespan)
 
@@ -317,7 +353,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     
     import random
     otp_code = f"{random.randint(100000, 999999)}"
-    expiry = datetime.utcnow() + timedelta(minutes=15)
+    expiry = datetime.utcnow() + timedelta(minutes=5)
     
     db_user = models.User(
         username=user.username, 
@@ -346,7 +382,11 @@ def verify_email(data: EmailVerify, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Mã xác thực không hợp lệ")
         
     if user.verification_code_expires and datetime.utcnow() > user.verification_code_expires:
-        raise HTTPException(status_code=400, detail="Mã xác thực đã hết hạn")
+        # Delete expired user so they can re-register
+        print(f"[VERIFY] Verification expired for user {user.username} (email: {user.email}). Deleting account.")
+        db.delete(user)
+        db.commit()
+        raise HTTPException(status_code=400, detail="Mã xác thực đã hết hạn. Vui lòng đăng ký lại để nhận mã mới.")
         
     user.is_verified = True
     user.verification_code = None
@@ -365,7 +405,7 @@ def resend_code(data: ResendCodeRequest, db: Session = Depends(get_db)):
     import random
     otp_code = f"{random.randint(100000, 999999)}"
     user.verification_code = otp_code
-    user.verification_code_expires = datetime.utcnow() + timedelta(minutes=15)
+    user.verification_code_expires = datetime.utcnow() + timedelta(minutes=5)
     db.commit()
     
     send_otp_email(user.email, otp_code, "F-Selling: Gửi lại mã xác minh tài khoản")
@@ -380,7 +420,7 @@ def forgot_password_request(data: ForgotPasswordRequest, db: Session = Depends(g
     import random
     otp_code = f"{random.randint(100000, 999999)}"
     user.verification_code = otp_code
-    user.verification_code_expires = datetime.utcnow() + timedelta(minutes=15)
+    user.verification_code_expires = datetime.utcnow() + timedelta(minutes=5)
     db.commit()
     
     send_otp_email(user.email, otp_code, "F-Selling: Mã khôi phục mật khẩu")

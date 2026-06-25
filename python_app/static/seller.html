@@ -8,36 +8,13 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        .tab-btn {
-            background: transparent; border: none; color: var(--text-muted); padding: 0.75rem 1.25rem;
-            font-size: 1rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
-        .db-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        .db-table th, .db-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .db-table th { background: #F8FAFC; font-weight: 600; color: var(--text-muted); }
-        
-        .shop-switcher {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 0.5rem 1rem; border-radius: 8px; outline: none;
-            cursor: pointer; font-weight: 600; appearance: auto;
-        }
-        .shop-switcher option { background: #1E293B; color: white; }
-        
-        .shop-list-card {
-            background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px;
-            padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;
-        }
-        .shop-list-card h4 { margin: 0; color: var(--text-main); }
-    </style>
+    <link rel="stylesheet" href="/css/seller.css">
+       
 </head>
 <body>
     <div class="nav-bar">
-        <h2 class="text-gradient">Quản trị Cửa hàng</h2>
+        <!-- <h2 class="text-gradient">Quản trị Cửa hàng</h2> -->
+         <img class="logo" src="img/logo.png" alt="">
         <div class="flex-row" style="gap: 1rem; align-items: center;">
             <button onclick="openPosShopSelector()" style="display: flex; align-items: center; gap: 0.3rem; background: var(--primary);"><i class="ph ph-shopping-cart"></i> Mở POS Bán Hàng</button>
             <button class="btn-outline" onclick="showChangePasswordModal()" style="display: flex; align-items: center; gap: 0.3rem;"><i class="ph ph-key"></i> Đổi mật khẩu</button>
@@ -884,36 +861,41 @@
             document.getElementById('changePasswordModal').style.display = 'none';
         }
 
-        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const old_password = document.getElementById('oldPassword').value;
-            const new_password = document.getElementById('newPassword').value;
-            const confirm = document.getElementById('confirmNewPassword').value;
-            const errorMsg = document.getElementById('changePasswordErrorMsg');
-            const successMsg = document.getElementById('changePasswordSuccessMsg');
-            errorMsg.innerText = '';
-            successMsg.innerText = '';
-            
-            if (new_password !== confirm) {
-                errorMsg.innerText = "Mật khẩu mới xác nhận không khớp!";
-                return;
-            }
-            
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?\":{}|<>_]).+$/;
-            if (!regex.test(new_password)) {
-                errorMsg.innerText = "Mật khẩu mới phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số!";
-                return;
-            }
-            
-            try {
-                const res = await apiCall('/auth/change-password', 'POST', { old_password, new_password });
-                successMsg.innerText = "Đổi mật khẩu thành công!";
-                localStorage.setItem('token', res.access_token);
-                alert("Đổi mật khẩu thành công!");
-                closeChangePasswordModal();
-            } catch (err) {
-                errorMsg.innerText = err.message;
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('changePasswordForm');
+            if (!form) return;
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const old_password = document.getElementById('oldPassword').value;
+                const new_password = document.getElementById('newPassword').value;
+                const confirm = document.getElementById('confirmNewPassword').value;
+                const errorMsg = document.getElementById('changePasswordErrorMsg');
+                const successMsg = document.getElementById('changePasswordSuccessMsg');
+                errorMsg.innerText = '';
+                successMsg.innerText = '';
+                
+                if (new_password !== confirm) {
+                    errorMsg.innerText = "Đổi mật khẩu mới xác nhận không khớp!";
+                    return;
+                }
+                
+                const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?\":{}|<>_]).+$/;
+                if (!regex.test(new_password)) {
+                    errorMsg.innerText = "Mật khẩu mới phải bao gồm kí tự đặc biệt, chữ hoa, chữ thường và số!";
+                    return;
+                }
+                
+                try {
+                    const res = await apiCall('/auth/change-password', 'POST', { old_password, new_password });
+                    successMsg.innerText = "Đổi mật khẩu thành công!";
+                    localStorage.setItem('token', res.access_token);
+                    alert("Đổi mật khẩu thành công!");
+                    closeChangePasswordModal();
+                } catch (err) {
+                    errorMsg.innerText = err.message;
+                }
+            });
         });
 
         init();
