@@ -30,7 +30,7 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     }
 
     const res = await fetch(`${BASE_URL}${endpoint}`, options);
-    if (res.status === 401) {
+    if (res.status === 401 && !endpoint.includes('/auth/login')) {
         // Chỉ xóa localStorage nếu token hiện tại trong localStorage trùng với token cũ của tab này
         if (localStorage.getItem('token') === cachedToken) {
             localStorage.clear();

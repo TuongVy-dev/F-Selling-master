@@ -40,6 +40,7 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     shop_id = Column(Integer, ForeignKey("shops.id"))
+    is_active = Column(Boolean, default=True)
     
     shop = relationship("Shop", back_populates="categories")
     products = relationship("Product", back_populates="category")

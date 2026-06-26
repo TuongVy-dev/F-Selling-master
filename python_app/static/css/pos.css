@@ -104,6 +104,41 @@ h2{
     margin-bottom: 0;
 }
 
-.input-wrapper input{
+.input-wrapper input {
     padding: 0.75rem 1rem;
+}
+
+/* POS Responsive for mobile screens */
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto !important;
+    }
+    
+    .pos-layout {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        padding: 0.5rem;
+        gap: 1.5rem;
+    }
+    
+    .pos-col {
+        width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+    
+    .scroll-area {
+        max-height: 350px;
+    }
+    
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .cart-item {
+        grid-template-columns: 1.5fr 1fr 1fr 20px;
+        font-size: 0.85rem;
+    }
 }

@@ -31,42 +31,46 @@
 
     <div class="container">
         <!-- Tabs Header -->
-        <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem;">
+        <div class="tabs-wrapper">
             <button class="tab-btn active" onclick="switchTab('dashboard')">Doanh thu Shop</button>
             <button class="tab-btn" onclick="switchTab('logs')">Nhật Ký Hệ Thống</button>
         </div>
 
         <div id="dashboard" class="tab-content active glass-card">
             <h3>Doanh thu các Shop</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tên Shop</th>
-                        <th>Tổng doanh thu (VNĐ)</th>
-                    </tr>
-                </thead>
-                <tbody id="shopList">
-                    <!-- Populated by JS -->
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tên Shop</th>
+                            <th>Tổng doanh thu (VNĐ)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shopList">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
         
         <div id="logs" class="tab-content glass-card">
             <h3>Nhật Ký Hệ Thống</h3>
-            <table class="db-table" style="margin-top: 1rem;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Thời gian</th>
-                        <th>Người dùng</th>
-                        <th>Hành động</th>
-                        <th>Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody id="logList">
-                    <!-- Populated by JS -->
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="db-table" style="margin-top: 1rem;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Thời gian</th>
+                            <th>Người dùng</th>
+                            <th>Hành động</th>
+                            <th>Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logList">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

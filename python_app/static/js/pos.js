@@ -41,7 +41,7 @@ async function loadProducts() {
     if(!currentShopId) return;
     try {
         const res = await apiCall(`/products/${currentShopId}`);
-        products = res.filter(p => p.is_active !== false);
+        products = res.filter(p => p.is_active !== false && p.category_is_active !== false);
         renderProducts(products);
     } catch (e) { showToast(e.message); }
 }

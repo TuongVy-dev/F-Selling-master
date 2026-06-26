@@ -87,6 +87,13 @@ async def lifespan(app: FastAPI):
     except Exception:
         db.rollback()
 
+    try:
+        from sqlalchemy import text
+        db.execute(text("ALTER TABLE categories ADD COLUMN is_active BOOLEAN DEFAULT 1"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
     # User table migrations
     try:
         from sqlalchemy import text
@@ -139,7 +146,8 @@ async def lifespan(app: FastAPI):
     db.close()
     
     # Start background scheduler to clean up expired unverified users
-    scheduler = BackgroundScheduler()
+    import zoneinfo
+    scheduler = BackgroundScheduler(timezone=zoneinfo.ZoneInfo("UTC"))
     scheduler.add_job(cleanup_expired_unverified_users, "interval", minutes=1)
     scheduler.start()
     print("[SCHEDULER] Background cleanup task started - runs every 1 minute")
@@ -165,7 +173,9 @@ ALGORITHM = "HS256"
 
 def log_to_file(msg: str):
     try:
-        with open("g:/F-Selling-master/python_app/request_log.txt", "a", encoding="utf-8") as f:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        log_path = os.path.join(base_dir, "request_log.txt")
+        with open(log_path, "a", encoding="utf-8") as f:
             f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}\n")
     except Exception as e:
         print(f"Error logging to file: {e}")
@@ -220,6 +230,10 @@ class ProductCreate(BaseModel):
     price: float
     category_id: int
     image_url: Optional[str] = None
+
+class CategoryUpdate(BaseModel):
+    name: str
+    is_active: bool
 
 class VoucherCreate(BaseModel):
     code: str
@@ -517,15 +531,41 @@ def create_shop(shop: ShopCreate, db: Session = Depends(get_db), current_user: m
     if count >= 3:
         raise HTTPException(status_code=400, detail="Bạn chỉ được tạo tối đa 3 cửa hàng")
         
+    name = shop.name.strip() if shop.name else ""
+    address = shop.business_address.strip() if shop.business_address else ""
+    tax_code = shop.tax_code.strip() if shop.tax_code else ""
+    phone = shop.phone.strip() if shop.phone else ""
+    email = shop.email.strip() if shop.email else ""
+    bank_acc = shop.bank_account_no.strip() if shop.bank_account_no else ""
+    bank_name = shop.bank_account_name.strip() if shop.bank_account_name else ""
+    bank_code = shop.bank_code.strip() if shop.bank_code else ""
+    
+    if not name:
+        raise HTTPException(status_code=400, detail="Tên cửa hàng không được để trống")
+    if not address:
+        raise HTTPException(status_code=400, detail="Địa chỉ kinh doanh không được để trống")
+    if not tax_code:
+        raise HTTPException(status_code=400, detail="Mã số thuế không được để trống")
+    if not phone:
+        raise HTTPException(status_code=400, detail="Số điện thoại không được để trống")
+    if not email:
+        raise HTTPException(status_code=400, detail="Email không được để trống")
+    if not bank_code:
+        raise HTTPException(status_code=400, detail="Vui lòng chọn ngân hàng")
+    if not bank_acc:
+        raise HTTPException(status_code=400, detail="Số tài khoản không được để trống")
+    if not bank_name:
+        raise HTTPException(status_code=400, detail="Tên chủ tài khoản không được để trống")
+        
     new_shop = models.Shop(
-        name=shop.name,
-        business_address=shop.business_address,
-        tax_code=shop.tax_code,
-        phone=shop.phone,
-        email=shop.email,
-        bank_account_no=shop.bank_account_no, 
-        bank_account_name=shop.bank_account_name,
-        bank_code=shop.bank_code, 
+        name=name,
+        business_address=address,
+        tax_code=tax_code,
+        phone=phone,
+        email=email,
+        bank_account_no=bank_acc, 
+        bank_account_name=bank_name,
+        bank_code=bank_code, 
         owner_id=current_user.id
     )
     db.add(new_shop)
@@ -540,14 +580,40 @@ def update_shop(shop_id: int, shop: ShopCreate, db: Session = Depends(get_db), c
     if not db_shop:
         raise HTTPException(status_code=404, detail="Không tìm thấy cửa hàng")
         
-    db_shop.name = shop.name
-    db_shop.business_address = shop.business_address
-    db_shop.tax_code = shop.tax_code
-    db_shop.phone = shop.phone
-    db_shop.email = shop.email
-    db_shop.bank_account_no = shop.bank_account_no
-    db_shop.bank_account_name = shop.bank_account_name
-    db_shop.bank_code = shop.bank_code
+    name = shop.name.strip() if shop.name else ""
+    address = shop.business_address.strip() if shop.business_address else ""
+    tax_code = shop.tax_code.strip() if shop.tax_code else ""
+    phone = shop.phone.strip() if shop.phone else ""
+    email = shop.email.strip() if shop.email else ""
+    bank_acc = shop.bank_account_no.strip() if shop.bank_account_no else ""
+    bank_name = shop.bank_account_name.strip() if shop.bank_account_name else ""
+    bank_code = shop.bank_code.strip() if shop.bank_code else ""
+    
+    if not name:
+        raise HTTPException(status_code=400, detail="Tên cửa hàng không được để trống")
+    if not address:
+        raise HTTPException(status_code=400, detail="Địa chỉ kinh doanh không được để trống")
+    if not tax_code:
+        raise HTTPException(status_code=400, detail="Mã số thuế không được để trống")
+    if not phone:
+        raise HTTPException(status_code=400, detail="Số điện thoại không được để trống")
+    if not email:
+        raise HTTPException(status_code=400, detail="Email không được để trống")
+    if not bank_code:
+        raise HTTPException(status_code=400, detail="Vui lòng chọn ngân hàng")
+    if not bank_acc:
+        raise HTTPException(status_code=400, detail="Số tài khoản không được để trống")
+    if not bank_name:
+        raise HTTPException(status_code=400, detail="Tên chủ tài khoản không được để trống")
+        
+    db_shop.name = name
+    db_shop.business_address = address
+    db_shop.tax_code = tax_code
+    db_shop.phone = phone
+    db_shop.email = email
+    db_shop.bank_account_no = bank_acc
+    db_shop.bank_account_name = bank_name
+    db_shop.bank_code = bank_code
     db.commit()
     db.refresh(db_shop)
     log_system_action(db, current_user.id, "UPDATE_SHOP", f"Cập nhật cửa hàng: '{db_shop.name}' (SĐT: {db_shop.phone})")
@@ -578,11 +644,36 @@ def create_category(name: str, shop_id: int, db: Session = Depends(get_db), curr
     shop = db.query(models.Shop).filter(models.Shop.id == shop_id, models.Shop.owner_id == current_user.id).first()
     if not shop:
         raise HTTPException(status_code=403, detail="Not your shop")
-    cat = models.Category(name=name, shop_id=shop_id)
+        
+    name_stripped = name.strip() if name else ""
+    if not name_stripped:
+        raise HTTPException(status_code=400, detail="Tên danh mục không được để trống")
+        
+    cat = models.Category(name=name_stripped, shop_id=shop_id, is_active=True)
     db.add(cat)
     db.commit()
-    log_system_action(db, current_user.id, "CREATE_CATEGORY", f"Tạo danh mục '{name}' cho shop #{shop_id}")
+    log_system_action(db, current_user.id, "CREATE_CATEGORY", f"Tạo danh mục '{name_stripped}' cho shop #{shop_id}")
     return cat
+
+@app.put("/api/categories/{category_id}")
+def update_category(category_id: int, cat: CategoryUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    db_cat = db.query(models.Category).filter(models.Category.id == category_id).first()
+    if not db_cat:
+        raise HTTPException(status_code=404, detail="Danh mục không tồn tại")
+    shop = db.query(models.Shop).filter(models.Shop.id == db_cat.shop_id, models.Shop.owner_id == current_user.id).first()
+    if not shop:
+        raise HTTPException(status_code=403, detail="Không có quyền chỉnh sửa danh mục của cửa hàng này")
+        
+    name_stripped = cat.name.strip() if cat.name else ""
+    if not name_stripped:
+        raise HTTPException(status_code=400, detail="Tên danh mục không được để trống")
+        
+    db_cat.name = name_stripped
+    db_cat.is_active = cat.is_active
+    db.commit()
+    db.refresh(db_cat)
+    log_system_action(db, current_user.id, "UPDATE_CATEGORY", f"Cập nhật danh mục: '{db_cat.name}' (ID: {db_cat.id}, Active: {db_cat.is_active})")
+    return db_cat
 
 @app.get("/api/categories/{shop_id}")
 def get_categories(shop_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
@@ -634,7 +725,25 @@ def create_product(
 
 @app.get("/api/products/{shop_id}")
 def get_products(shop_id: int, db: Session = Depends(get_db)):
-    return db.query(models.Product).filter(models.Product.shop_id == shop_id).all()
+    products = db.query(models.Product).filter(models.Product.shop_id == shop_id).all()
+    res = []
+    for p in products:
+        cat_active = True
+        if p.category:
+            cat_active = p.category.is_active if p.category.is_active is not None else True
+        res.append({
+            "id": p.id,
+            "code": p.code,
+            "name": p.name,
+            "price": p.price,
+            "stock": p.stock,
+            "image_url": p.image_url,
+            "is_active": p.is_active,
+            "category_id": p.category_id,
+            "shop_id": p.shop_id,
+            "category_is_active": cat_active
+        })
+    return res
 
 @app.put("/api/products/{product_id}/status")
 def toggle_product_status(product_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
@@ -655,6 +764,82 @@ def delete_product(product_id: int, db: Session = Depends(get_db), current_user:
     db.commit()
     log_system_action(db, current_user.id, "DELETE_PRODUCT", f"Xóa SP '{prod.name}' ({prod.code})")
     return {"msg": "Deleted"}
+
+@app.post("/api/orders/webhook")
+def order_webhook(
+    request_data: dict, 
+    x_webhook_secret: Optional[str] = Header(None), 
+    authorization: Optional[str] = Header(None), 
+    db: Session = Depends(get_db)
+):
+    webhook_secret = os.getenv("PAYMENT_WEBHOOK_SECRET")
+    if webhook_secret:
+        client_secret = x_webhook_secret or authorization
+        if client_secret and client_secret.startswith("Bearer "):
+            client_secret = client_secret.split(" ")[1]
+        elif client_secret and client_secret.startswith("Apikey "):
+            client_secret = client_secret.split(" ")[1]
+            
+        if client_secret != webhook_secret:
+            raise HTTPException(status_code=401, detail="Webhook secret không hợp lệ")
+
+    order_ids = []
+    
+    if "data" in request_data and isinstance(request_data["data"], list):
+        for item in request_data["data"]:
+            desc = item.get("description", "")
+            match = re.search(r"ORDER(\d+)", desc, re.IGNORECASE)
+            if match:
+                order_ids.append(int(match.group(1)))
+                
+    elif "data" in request_data and isinstance(request_data["data"], dict) and "orderCode" in request_data["data"]:
+        order_code = request_data["data"]["orderCode"]
+        try:
+            order_ids.append(int(order_code))
+        except (ValueError, TypeError):
+            pass
+        desc = request_data["data"].get("description", "")
+        match = re.search(r"ORDER(\d+)", desc, re.IGNORECASE)
+        if match:
+            order_ids.append(int(match.group(1)))
+            
+    elif "content" in request_data or "transferAmount" in request_data:
+        desc = request_data.get("content", "") or request_data.get("description", "")
+        match = re.search(r"ORDER(\d+)", desc, re.IGNORECASE)
+        if match:
+            order_ids.append(int(match.group(1)))
+            
+    elif "order_id" in request_data:
+        try:
+            order_ids.append(int(request_data["order_id"]))
+        except (ValueError, TypeError):
+            pass
+
+    if not order_ids:
+        req_str = str(request_data)
+        match = re.search(r"ORDER(\d+)", req_str, re.IGNORECASE)
+        if match:
+            order_ids.append(int(match.group(1)))
+
+    if not order_ids:
+        raise HTTPException(status_code=400, detail="Không tìm thấy mã đơn hàng ORDERxxx trong thông tin thanh toán")
+
+    updated_orders = []
+    for oid in set(order_ids):
+        order = db.query(models.Order).filter(models.Order.id == oid).first()
+        if order:
+            if order.status != "PAID":
+                order.status = "PAID"
+                db.commit()
+                log_system_action(db, None, "WEBHOOK_PAYMENT", f"Order {order.id} marked PAID via webhook")
+                updated_orders.append(order.id)
+            else:
+                updated_orders.append(order.id)
+                
+    if not updated_orders:
+        raise HTTPException(status_code=404, detail="Không tìm thấy đơn hàng tương ứng")
+        
+    return {"msg": f"Cập nhật thành công đơn hàng: {updated_orders}", "order_ids": updated_orders}
 
 @app.post("/api/orders/{shop_id}")
 def create_order(shop_id: int, order: OrderCreate, db: Session = Depends(get_db)):
@@ -717,45 +902,71 @@ def get_order(order_id: int, db: Session = Depends(get_db), current_user: models
         "payment_method": order.payment_method
     }
 
-@app.post("/api/orders/webhook")
-def order_webhook(data: PaymentWebhook, x_webhook_secret: str = Header(None), db: Session = Depends(get_db)):
-    webhook_secret = os.getenv("PAYMENT_WEBHOOK_SECRET")
-    if webhook_secret and x_webhook_secret != webhook_secret:
-        raise HTTPException(status_code=401, detail="Webhook secret không hợp lệ")
-    order = db.query(models.Order).filter(models.Order.id == data.order_id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="Đơn hàng không tồn tại")
-    if data.status and data.status.upper() != "PAID":
-        raise HTTPException(status_code=400, detail="Webhook chỉ hỗ trợ trạng thái PAID")
-    if order.status == "PAID":
-        return {"msg": "Đơn hàng đã được thanh toán trước đó", "order_id": order.id}
-    order.status = "PAID"
-    db.commit()
-    log_system_action(db, None, "WEBHOOK_PAYMENT", f"Order {order.id} marked PAID via webhook")
-    return {"msg": "Đã cập nhật trạng thái đơn hàng là PAID", "order_id": order.id}
+# Webhook moved above
 
 @app.post("/api/vouchers")
 def create_voucher(v: VoucherCreate, shop_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    code_stripped = v.code.strip() if v.code else ""
+    if not code_stripped:
+        raise HTTPException(status_code=400, detail="Mã voucher không được để trống")
+        
+    if v.discount_value < 1:
+        raise HTTPException(status_code=400, detail="Giá trị giảm tối thiểu phải là 1")
+        
+    if v.discount_type == "percentage":
+        if v.discount_value <= 0 or v.discount_value > 100:
+            raise HTTPException(status_code=400, detail="Giá trị giảm phần trăm phải từ 1% đến 100%")
+            
+    if v.min_order_value < 0:
+        raise HTTPException(status_code=400, detail="Đơn tối thiểu không được âm")
+
+    existing = db.query(models.Voucher).filter(models.Voucher.code == code_stripped, models.Voucher.shop_id == shop_id).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Mã voucher này đã tồn tại trong cửa hàng")
+
     db_v = models.Voucher(
-         code=v.code, shop_id=shop_id, discount_type=v.discount_type, discount_value=v.discount_value,
-        min_order_value=v.min_order_value, max_discount=v.max_discount, usage_limit=v.usage_limit, expires_at=v.expires_at
+         code=code_stripped, shop_id=shop_id, discount_type=v.discount_type, discount_value=v.discount_value,
+        min_order_value=v.min_order_value, max_discount=0, usage_limit=v.usage_limit, expires_at=v.expires_at
     )
     db.add(db_v)
     db.commit()
-    log_system_action(db, current_user.id, "CREATE_VOUCHER", f"Tạo Voucher '{v.code}' - Giảm {v.discount_value}{'%' if v.discount_type=='percentage' else 'đ'}, Đơn tối thiểu: {v.min_order_value:,.0f}đ")
+    log_system_action(db, current_user.id, "CREATE_VOUCHER", f"Tạo Voucher '{code_stripped}' - Giảm {v.discount_value}{'%' if v.discount_type=='percentage' else 'đ'}, Đơn tối thiểu: {v.min_order_value:,.0f}đ")
     return db_v
 
 @app.put("/api/vouchers/{voucher_id}")
 def update_voucher(voucher_id: int, v: VoucherCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-
     db_v = db.query(models.Voucher).filter(models.Voucher.id == voucher_id).first()
     if not db_v:
         raise HTTPException(status_code=404, detail="Voucher không tồn tại")
-    db_v.code = v.code
+        
+    # Verify shop ownership
+    shop = db.query(models.Shop).filter(models.Shop.id == db_v.shop_id, models.Shop.owner_id == current_user.id).first()
+    if not shop:
+        raise HTTPException(status_code=403, detail="Không có quyền chỉnh sửa voucher của cửa hàng này")
+        
+    code_stripped = v.code.strip() if v.code else ""
+    if not code_stripped:
+        raise HTTPException(status_code=400, detail="Mã voucher không được để trống")
+        
+    if v.discount_value < 1:
+        raise HTTPException(status_code=400, detail="Giá trị giảm tối thiểu phải là 1")
+        
+    if v.discount_type == "percentage":
+        if v.discount_value <= 0 or v.discount_value > 100:
+            raise HTTPException(status_code=400, detail="Giá trị giảm phần trăm phải từ 1% đến 100%")
+            
+    if v.min_order_value < 0:
+        raise HTTPException(status_code=400, detail="Đơn tối thiểu không được âm")
+
+    existing = db.query(models.Voucher).filter(models.Voucher.code == code_stripped, models.Voucher.shop_id == db_v.shop_id, models.Voucher.id != voucher_id).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Mã voucher này đã tồn tại trong cửa hàng")
+
+    db_v.code = code_stripped
     db_v.discount_type = v.discount_type
     db_v.discount_value = v.discount_value
     db_v.min_order_value = v.min_order_value
-    db_v.max_discount = v.max_discount
+    db_v.max_discount = 0
     db_v.usage_limit = v.usage_limit
     db_v.expires_at = v.expires_at
     db.commit()

@@ -16,7 +16,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         }
     } catch (err) {
         // Kiểm tra nếu là lỗi 401 hoặc lỗi xác thực, hiển thị message chung
-        if (err.message.includes('401') || err.message.includes('không chính xác')) {
+        if (err.message.includes('401') || err.message.includes('không chính xác') || err.message.includes('không đúng') || err.message.includes('Unauthorized')) {
             errorMsg.innerText = "Tên đăng nhập hoặc mật khẩu không đúng";
             console.log(errorMsg);
         } else {
