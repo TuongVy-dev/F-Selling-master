@@ -34,4 +34,13 @@
     height: 50px;
     width: auto;
 }
+
+
+.input-wrapper i {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin-bottom: 1em;
+}
     

@@ -240,6 +240,12 @@ class OrderCreate(BaseModel):
     voucher_code: Optional[str] = None
     payment_method: str = "transfer"
 
+class PaymentWebhook(BaseModel):
+    order_id: int
+    status: Optional[str] = "PAID"
+    transaction_id: Optional[str] = None
+    amount: Optional[float] = None
+
 # Dependencies
 def get_db():
     db = database.SessionLocal()
@@ -689,14 +695,49 @@ def create_order(shop_id: int, order: OrderCreate, db: Session = Depends(get_db)
     db.commit()
     
     shop = db.query(models.Shop).filter(models.Shop.id == shop_id).first()
-    qr_url = f"https://img.vietqr.io/image/{shop.bank_code}-{shop.bank_account_no}-compact.png?amount={int(total)}&addInfo=ORDER{new_order.id}&accountName={shop.name}"
+    qr_url = f"https://img.vietqr.io/image/{shop.bank_code}-{shop.bank_account_no}-compact2.png?amount={int(total)}&addInfo=ORDER{new_order.id}&accountName={shop.bank_account_name}"
     
     return {"order_id": new_order.id, "subtotal": subtotal, "discount": discount_amount, "total": total, "qr_url": qr_url}
+
+@app.get("/api/orders/{order_id}")
+def get_order(order_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Không tìm thấy đơn hàng")
+    shop = db.query(models.Shop).filter(models.Shop.id == order.shop_id).first()
+    if not shop:
+        raise HTTPException(status_code=404, detail="Không tìm thấy cửa hàng của đơn hàng")
+    if current_user.role != "ADMIN" and shop.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Không có quyền truy cập đơn hàng này")
+    return {
+        "id": order.id,
+        "shop_id": order.shop_id,
+        "status": order.status,
+        "total_amount": order.total_amount,
+        "payment_method": order.payment_method
+    }
+
+@app.post("/api/orders/webhook")
+def order_webhook(data: PaymentWebhook, x_webhook_secret: str = Header(None), db: Session = Depends(get_db)):
+    webhook_secret = os.getenv("PAYMENT_WEBHOOK_SECRET")
+    if webhook_secret and x_webhook_secret != webhook_secret:
+        raise HTTPException(status_code=401, detail="Webhook secret không hợp lệ")
+    order = db.query(models.Order).filter(models.Order.id == data.order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Đơn hàng không tồn tại")
+    if data.status and data.status.upper() != "PAID":
+        raise HTTPException(status_code=400, detail="Webhook chỉ hỗ trợ trạng thái PAID")
+    if order.status == "PAID":
+        return {"msg": "Đơn hàng đã được thanh toán trước đó", "order_id": order.id}
+    order.status = "PAID"
+    db.commit()
+    log_system_action(db, None, "WEBHOOK_PAYMENT", f"Order {order.id} marked PAID via webhook")
+    return {"msg": "Đã cập nhật trạng thái đơn hàng là PAID", "order_id": order.id}
 
 @app.post("/api/vouchers")
 def create_voucher(v: VoucherCreate, shop_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     db_v = models.Voucher(
-        code=v.code, shop_id=shop_id, discount_type=v.discount_type, discount_value=v.discount_value,
+         code=v.code, shop_id=shop_id, discount_type=v.discount_type, discount_value=v.discount_value,
         min_order_value=v.min_order_value, max_discount=v.max_discount, usage_limit=v.usage_limit, expires_at=v.expires_at
     )
     db.add(db_v)
@@ -706,6 +747,7 @@ def create_voucher(v: VoucherCreate, shop_id: int, db: Session = Depends(get_db)
 
 @app.put("/api/vouchers/{voucher_id}")
 def update_voucher(voucher_id: int, v: VoucherCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+
     db_v = db.query(models.Voucher).filter(models.Voucher.id == voucher_id).first()
     if not db_v:
         raise HTTPException(status_code=404, detail="Voucher không tồn tại")
