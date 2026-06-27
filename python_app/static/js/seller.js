@@ -265,6 +265,7 @@ function renderShopsList() {
     allShops.forEach(s => {
         const activeBadge = s.is_active ? '<span style="color:var(--success); font-size: 0.8rem; margin-left: 0.5rem; padding: 2px 6px; background: rgba(16,185,129,0.1); border-radius: 4px;">ACTIVE</span>' : '<span style="color:#ef4444; font-size: 0.8rem; margin-left: 0.5rem; padding: 2px 6px; background: rgba(239,68,68,0.1); border-radius: 4px;">INACTIVE</span>';
         const toggleBtn = `<button class="btn-outline" onclick="toggleShopStatus(${s.id})" style="padding: 0.5rem 1rem; margin-right: 0.5rem;" title="Đổi trạng thái"><i class="ph ph-power"></i></button>`;
+        const deleteBtn = `<button class="btn-outline" onclick="deleteShop(${s.id})" style="padding: 0.5rem 1rem; color: #ef4444; margin-left: 0.5rem;" title="Xóa"><i class="ph ph-trash"></i></button>`;
         
         listDiv.innerHTML += `
             <div class="shop-list-card">
@@ -275,6 +276,7 @@ function renderShopsList() {
                 <div style="display: flex;">
                     ${toggleBtn}
                     <button class="btn-outline" onclick="openEditShopForm(${s.id})" style="padding: 0.5rem 1rem;"><i class="ph ph-pencil"></i> Chỉnh sửa</button>
+                    ${deleteBtn}
                 </div>
             </div>
         `;
@@ -287,6 +289,25 @@ async function toggleShopStatus(id) {
         showToast("Đã cập nhật trạng thái cửa hàng!");
         init();
     } catch(e) { showToast(e.message); }
+}
+
+function deleteShop(id) {
+    showCustomConfirm(
+        "Xác nhận xóa cửa hàng",
+        "Bạn có chắc muốn xóa vĩnh viễn cửa hàng này và toàn bộ dữ liệu liên quan (sản phẩm, danh mục, voucher, đơn hàng)?",
+        async () => {
+            try {
+                await apiCall(`/shops/${id}`, 'DELETE');
+                showToast("Đã xóa cửa hàng thành công!");
+                // Clear selected shop if it was the one deleted
+                if (currentShopId === id) {
+                    currentShopId = null;
+                    localStorage.removeItem('currentShopId');
+                }
+                init();
+            } catch(e) { showToast(e.message); }
+        }
+    );
 }
 
 function openCreateShopForm() {

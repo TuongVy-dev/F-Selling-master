@@ -4,6 +4,8 @@ let currentShopId = parseInt(localStorage.getItem('currentShopId'));
 
 let cart = [];
 let products = [];
+let categories = [];
+let currentCategoryId = null;
 let currentVoucher = null;
 let discount = 0;
 let subtotal = 0;
@@ -25,6 +27,7 @@ async function loadShop() {
             localStorage.setItem('currentShopId', currentShopId);
             sel.value = currentShopId;
         }
+        loadCategories();
         loadProducts();
     } catch(e) {}
 }
@@ -42,8 +45,44 @@ async function loadProducts() {
     try {
         const res = await apiCall(`/products/${currentShopId}`);
         products = res.filter(p => p.is_active !== false && p.category_is_active !== false);
-        renderProducts(products);
+        filterAndRenderProducts();
     } catch (e) { showToast(e.message); }
+}
+
+async function loadCategories() {
+    if(!currentShopId) return;
+    try {
+        const res = await apiCall(`/categories/${currentShopId}`);
+        categories = res.filter(c => c.is_active !== false);
+        renderCategories();
+    } catch (e) { console.error(e); }
+}
+
+function renderCategories() {
+    const container = document.getElementById('categoryFilter');
+    if(!container) return;
+    container.innerHTML = `<button class="category-btn ${!currentCategoryId ? 'active' : ''}" onclick="filterByCategory(null)">Tất cả</button>`;
+    categories.forEach(c => {
+        container.innerHTML += `<button class="category-btn ${currentCategoryId === c.id ? 'active' : ''}" onclick="filterByCategory(${c.id})">${c.name}</button>`;
+    });
+}
+
+function filterByCategory(catId) {
+    currentCategoryId = catId;
+    renderCategories();
+    filterAndRenderProducts();
+}
+
+function filterAndRenderProducts() {
+    let filtered = products;
+    if (currentCategoryId) {
+        filtered = filtered.filter(p => p.category_id === currentCategoryId);
+    }
+    const searchVal = document.getElementById('searchProd').value.toLowerCase();
+    if (searchVal) {
+        filtered = filtered.filter(p => (p.code && p.code.toLowerCase() === searchVal) || p.name.toLowerCase().includes(searchVal));
+    }
+    renderProducts(filtered);
 }
 
 function renderProducts(list) {
@@ -68,9 +107,7 @@ function renderProducts(list) {
 
 // Tìm kiếm / Quét mã vạch
 document.getElementById('searchProd').addEventListener('input', (e) => {
-    const val = e.target.value.toLowerCase();
-    const filtered = products.filter(p => (p.code && p.code.toLowerCase() === val) || p.name.toLowerCase().includes(val));
-    renderProducts(filtered);
+    filterAndRenderProducts();
 });
 
 function addToCart(p) {

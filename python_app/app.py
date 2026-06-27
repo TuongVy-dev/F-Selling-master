@@ -1,6 +1,6 @@
 # Force reload to recreate admin seed user
 import uvicorn
-from fastapi import FastAPI, Depends, HTTPException, status, Header, File, UploadFile, Form, Query
+from fastapi import FastAPI, Depends, HTTPException, status, Header, File, UploadFile, Form, Query, Request
 import shutil
 import os
 import uuid
@@ -635,8 +635,26 @@ def get_shops(db: Session = Depends(get_db), current_user: models.User = Depends
     shops = db.query(models.Shop).filter(models.Shop.owner_id == current_user.id).all()
     log_to_file(f"get_shops DB query returned: {[s.id for s in shops]}")
     print(f"DEBUG: get_shops called by user '{current_user.username}' (ID: {current_user.id})")
-    print(f"DEBUG: shops returned: {[s.id for s in shops]}")
     return shops
+
+@app.delete("/api/shops/{shop_id}")
+def delete_shop(shop_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    db_shop = db.query(models.Shop).filter(models.Shop.id == shop_id, models.Shop.owner_id == current_user.id).first()
+    if not db_shop:
+        raise HTTPException(status_code=404, detail="Không tìm thấy cửa hàng")
+    
+    orders = db.query(models.Order).filter(models.Order.shop_id == shop_id).all()
+    for o in orders:
+        db.query(models.OrderItem).filter(models.OrderItem.order_id == o.id).delete()
+    db.query(models.Order).filter(models.Order.shop_id == shop_id).delete()
+    db.query(models.Product).filter(models.Product.shop_id == shop_id).delete()
+    db.query(models.Category).filter(models.Category.shop_id == shop_id).delete()
+    db.query(models.Voucher).filter(models.Voucher.shop_id == shop_id).delete()
+    
+    db.delete(db_shop)
+    db.commit()
+    log_system_action(db, current_user.id, "DELETE_SHOP", f"Xóa cửa hàng '{db_shop.name}'")
+    return {"msg": "Deleted"}
 
 @app.post("/api/categories")
 def create_category(name: str, shop_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
@@ -766,12 +784,19 @@ def delete_product(product_id: int, db: Session = Depends(get_db), current_user:
     return {"msg": "Deleted"}
 
 @app.post("/api/orders/webhook")
-def order_webhook(
-    request_data: dict, 
+async def order_webhook(
+    request: Request, 
     x_webhook_secret: Optional[str] = Header(None), 
     authorization: Optional[str] = Header(None), 
     db: Session = Depends(get_db)
 ):
+    try:
+        request_data = await request.json()
+    except Exception:
+        request_data = {}
+        
+    log_to_file(f"WEBHOOK RECEIVED: {request_data}")
+        
     webhook_secret = os.getenv("PAYMENT_WEBHOOK_SECRET")
     if webhook_secret:
         client_secret = x_webhook_secret or authorization

@@ -389,3 +389,22 @@ th {
     width: 100%;
     min-width: 500px;
 }
+
+/* Extra Mobile Adjustments */
+@media (max-width: 480px) {
+    .login-box, .verify-box, .glass-card {
+        padding: 1.25rem !important;
+        margin: 1rem !important;
+    }
+    .otp-field {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        font-size: 1.25rem !important;
+    }
+    .nav-bar h2 {
+        font-size: 1.2rem;
+    }
+    .store-card-name {
+        font-size: 1.25rem;
+    }
+}

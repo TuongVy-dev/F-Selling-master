@@ -16,13 +16,16 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     }
 
     try {
-        await apiCall('/auth/register', 'POST', { username, email, password, role: 'SELLER' });
         submitBtn.disabled = true;
+        submitBtn.innerText = "Đang đăng ký...";
+        await apiCall('/auth/register', 'POST', { username, email, password, role: 'SELLER' });
         localStorage.setItem('register_email', email);
         localStorage.setItem('otp_send_time', Date.now().toString());
         alert("Đăng ký thành công! Đang chuyển hướng về trang xác thực tài khoản...");
         window.location.href = "/verify";
     } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Đăng ký";
         document.getElementById('errorMsg').innerText = err.message;
     }
 });
