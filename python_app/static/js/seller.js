@@ -567,7 +567,7 @@ function filterProducts() {
             <td>${p.name} <br>${activeText}</td>
             <td>${p.price.toLocaleString()} ₫</td>
             <td>${p.stock}</td>
-            <td style="display:flex; justify-content: center; align-items: center; gap:0.5rem;">
+            <td style="display:flex; justify-content: center; align-items: center; gap:0.5rem; height: 7rem;">
                 <button class="btn-outline" onclick="toggleProductStatus(${p.id})" style="padding: 0.2rem 0.5rem;" title="Bật/Tắt"><i class="ph ph-power"></i></button>
                 <button class="btn-outline" onclick="deleteProduct(${p.id})" style="padding: 0.2rem 0.5rem; color:#ef4444;" title="Xóa"><i class="ph ph-trash"></i></button>
             </td>
