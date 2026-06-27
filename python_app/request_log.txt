@@ -12372,3 +12372,481 @@
 [2026-06-27 17:20:06] Auth failed: session_id mismatch for user 'vyltt' (DB=0a3588943fc84f72887f0910835ea0d1, Token=77324e47a7a94562997ad7b4bd991da6)
 [2026-06-27 17:20:08] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
 [2026-06-27 17:20:08] Auth success: user='vyltt' (ID=4)
+[2026-06-27 17:20:11] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 17:20:11] Auth success: user='vyltt' (ID=4)
+[2026-06-27 17:20:14] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 17:20:14] Auth success: user='vyltt' (ID=4)
+[2026-06-27 17:20:17] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 17:20:17] Auth success: user='vyltt' (ID=4)
+[2026-06-27 17:20:20] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 17:20:20] Auth success: user='vyltt' (ID=4)
+[2026-06-27 17:20:23] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 17:20:23] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:30] Login success: user='vyltt' (ID=4) -> sid=3cb4061140b947c8899cca2b30b8d106
+[2026-06-27 19:53:31] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:31] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:31] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 19:53:31] get_shops DB query returned: [5]
+[2026-06-27 19:53:31] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:31] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:31] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:31] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:31] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:31] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:34] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:34] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:37] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:37] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:40] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:40] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:43] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:43] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:46] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:46] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:49] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:49] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:52] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:52] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:55] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:55] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:53:58] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:53:58] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:01] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:01] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:04] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:04] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:07] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:07] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:10] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:10] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:10] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:10] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:13] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:13] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:13] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:13] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:13] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:13] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:16] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:16] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:19] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:19] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:22] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:22] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:25] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:25] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:28] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:28] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:31] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:31] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:34] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:34] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:37] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:37] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:40] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:40] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:43] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:43] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:45] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:45] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:46] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:46] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:49] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:49] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:51] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:51] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:51] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 19:54:51] get_shops DB query returned: [5]
+[2026-06-27 19:54:51] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:51] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:54] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:54] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:54:57] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:54:57] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:00] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:00] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:03] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:03] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:06] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:06] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:09] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:09] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:12] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:12] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:15] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:15] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:18] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:18] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:21] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:21] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:22] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:22] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:24] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:24] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:27] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:27] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:27] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:27] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:29] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:29] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:30] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:30] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:33] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:33] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:36] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:36] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:39] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:39] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:39] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 19:55:39] get_shops DB query returned: [5]
+[2026-06-27 19:55:39] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:39] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:39] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:39] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:39] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:39] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:42] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:42] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:45] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:45] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:48] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:48] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:51] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:51] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:53] Auth check: auth_header=None query_token=eyJhbGciOiJIUzI1NiIsInR5cCI6Ik
+[2026-06-27 19:55:53] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:54] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:54] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:55:57] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:55:57] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:56:00] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:00] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:56:03] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:03] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:56:06] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:06] Auth success: user='vyltt' (ID=4)
+[2026-06-27 19:56:14] Login success: user='admin' (ID=1) -> sid=6b09e29f9d704db9b30b89aace8d180c
+[2026-06-27 19:56:14] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:14] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:14] get_admin_dashboard requested by user='admin' (role=ADMIN)
+[2026-06-27 19:56:14] get_admin_dashboard: Found 5 shops in DB
+[2026-06-27 19:56:14] get_admin_dashboard: Returning 5 items
+[2026-06-27 19:56:17] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:17] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:18] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:18] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:20] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:20] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:23] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:23] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:26] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:26] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:29] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:29] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:32] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:32] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:35] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:35] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:38] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:38] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:41] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:41] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:44] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:44] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:47] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:47] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:50] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:53] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:53] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:56] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:56] Auth success: user='admin' (ID=1)
+[2026-06-27 19:56:59] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:56:59] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:02] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:02] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:05] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:05] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:08] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:08] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:11] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:11] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:14] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:14] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:17] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:17] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:20] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:20] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:23] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:23] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:26] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:26] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:29] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:29] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:32] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:32] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:35] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:35] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:38] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:38] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:41] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:41] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:44] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:44] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:47] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:47] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:50] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:51] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:51] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:53] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:53] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:55] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:55] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:56] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:56] Auth success: user='admin' (ID=1)
+[2026-06-27 19:57:59] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:57:59] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:02] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:02] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:05] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:05] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:08] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:08] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:11] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:11] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:14] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:14] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:17] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:17] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:20] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:20] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:23] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:23] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:26] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:26] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:29] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:29] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:32] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:32] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:35] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:35] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:38] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:38] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:41] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:41] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:44] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:44] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:47] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:47] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:50] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:53] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:53] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:56] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:56] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:59] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:59] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:59] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:58:59] Auth success: user='admin' (ID=1)
+[2026-06-27 19:58:59] get_admin_dashboard requested by user='admin' (role=ADMIN)
+[2026-06-27 19:58:59] get_admin_dashboard: Found 5 shops in DB
+[2026-06-27 19:58:59] get_admin_dashboard: Returning 5 items
+[2026-06-27 19:59:02] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:02] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:06] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:06] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:09] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:09] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:12] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:12] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:15] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:15] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:17] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:17] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:18] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:18] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:18] get_admin_dashboard requested by user='admin' (role=ADMIN)
+[2026-06-27 19:59:18] get_admin_dashboard: Found 5 shops in DB
+[2026-06-27 19:59:18] get_admin_dashboard: Returning 5 items
+[2026-06-27 19:59:18] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:18] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:18] get_admin_dashboard requested by user='admin' (role=ADMIN)
+[2026-06-27 19:59:18] get_admin_dashboard: Found 5 shops in DB
+[2026-06-27 19:59:18] get_admin_dashboard: Returning 5 items
+[2026-06-27 19:59:21] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:21] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:24] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:24] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:27] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:27] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:30] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:30] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:31] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:31] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:31] get_admin_dashboard requested by user='admin' (role=ADMIN)
+[2026-06-27 19:59:31] get_admin_dashboard: Found 5 shops in DB
+[2026-06-27 19:59:31] get_admin_dashboard: Returning 5 items
+[2026-06-27 19:59:31] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:31] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:31] get_admin_dashboard requested by user='admin' (role=ADMIN)
+[2026-06-27 19:59:31] get_admin_dashboard: Found 5 shops in DB
+[2026-06-27 19:59:31] get_admin_dashboard: Returning 5 items
+[2026-06-27 19:59:32] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:32] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:32] get_admin_dashboard requested by user='admin' (role=ADMIN)
+[2026-06-27 19:59:32] get_admin_dashboard: Found 5 shops in DB
+[2026-06-27 19:59:32] get_admin_dashboard: Returning 5 items
+[2026-06-27 19:59:32] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:32] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:35] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:35] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:38] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:38] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:41] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:41] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:44] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:44] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:47] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:47] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:50] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:53] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:53] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:56] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:56] Auth success: user='admin' (ID=1)
+[2026-06-27 19:59:59] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 19:59:59] Auth success: user='admin' (ID=1)
+[2026-06-27 20:00:02] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:02] Auth success: user='admin' (ID=1)
+[2026-06-27 20:00:05] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:05] Auth success: user='admin' (ID=1)
+[2026-06-27 20:00:08] Login success: user='vyltt' (ID=4) -> sid=4d8f463ad29349cb8452e12545dd0f43
+[2026-06-27 20:00:09] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:09] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:09] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 20:00:09] get_shops DB query returned: [5]
+[2026-06-27 20:00:09] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:09] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:09] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:09] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:09] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:09] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:12] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:12] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:15] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:15] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:18] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:18] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:21] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:21] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:24] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:24] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:27] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:27] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:30] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:30] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:33] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:33] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:36] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:36] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:37] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:37] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:37] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 20:00:37] get_shops DB query returned: [5]
+[2026-06-27 20:00:37] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:37] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:37] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:37] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:37] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:37] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:40] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:40] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:43] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:43] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:46] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:46] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:47] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:47] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:47] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:47] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:49] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:49] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 20:00:50] get_shops DB query returned: [5]
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 20:00:50] get_shops DB query returned: [5]
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:50] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:50] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 20:00:50] get_shops DB query returned: [5]
+[2026-06-27 20:00:51] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:51] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:51] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:51] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:51] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:51] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:53] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:53] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:56] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:56] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:00:59] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:00:59] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:03] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:03] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:06] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:06] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:15] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:15] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:18] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:18] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:21] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:21] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:24] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:24] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:27] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:27] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:30] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:30] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:32] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:32] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:34] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:34] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:34] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 20:01:34] get_shops DB query returned: [5]
+[2026-06-27 20:01:34] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:34] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:34] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:34] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:34] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:34] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:35] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:35] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:35] get_shops requested by user='vyltt' (ID=4)
+[2026-06-27 20:01:35] get_shops DB query returned: [5]
+[2026-06-27 20:01:35] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:35] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:35] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:35] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:35] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:35] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:38] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:38] Auth success: user='vyltt' (ID=4)
+[2026-06-27 20:01:41] Auth check: auth_header=Bearer eyJhbGciOiJIUzI1NiIsInR query_token=None
+[2026-06-27 20:01:41] Auth success: user='vyltt' (ID=4)
